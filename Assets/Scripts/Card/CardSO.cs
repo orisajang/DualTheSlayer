@@ -8,7 +8,7 @@ public enum CardType
 }
 
 [CreateAssetMenu(menuName = "Card/Card Data", fileName = "CardData")]
-public class Card : ScriptableObject
+public class CardSO : ScriptableObject
 {
     //유니티에서 제공하는 ScriptableObject를 이용해서 Inspector에서 Stage정보를 설정할 수 있도록 설정
     [SerializeField] private string cardName;

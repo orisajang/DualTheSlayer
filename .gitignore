@@ -77,3 +77,7 @@ crashlytics-build.properties
 #AssetStore	
 /[Aa]ssets/AssetStore/*
 !/[Aa]ssets/AssetStore/**/*.meta 
+
+# Resources
+/[Aa]ssets/Resources/*
+!/[Aa]ssets/Resources/**/*.meta

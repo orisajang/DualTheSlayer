@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class CardInstance
 {
-    private Card cardData;
+    private CardSO cardData;
     int currentCost;
 
-    public Card CardData => cardData;
+    public CardSO CardData => cardData;
 
-    public CardInstance(Card data)
+    public CardInstance(CardSO data)
     {
         cardData = data;
         currentCost = cardData.Cost;

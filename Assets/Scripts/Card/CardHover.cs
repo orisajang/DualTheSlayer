@@ -21,7 +21,7 @@ public class CardHover : MonoBehaviour,
     //호버링했을때 얼마만큼 커질지
     [SerializeField] private float hoverScale = 1.5f;
     //카드 낸다는 y축 기준을 설정하기 위해 빈 GameObject만듬 (이거 외부에서 받아오게해야함)
-    [SerializeField] private RectTransform _submitCardLine;
+    private RectTransform _submitCardLine;
 
     private void Awake()
     {
@@ -29,7 +29,10 @@ public class CardHover : MonoBehaviour,
         //canvas = gameObject.GetComponentInParent<Canvas>();
         canvas = InGameUIManager.Instance.MainCanvas;
         rect = GetComponent<RectTransform>();
-
+    }
+    public void Init(RectTransform transform)
+    {
+        _submitCardLine = transform;
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -51,6 +54,8 @@ public class CardHover : MonoBehaviour,
     //드래그 시작
     public void OnBeginDrag(PointerEventData eventData)
     {
+        //자신의 턴이 아니면 return
+        if (!IsDragAble()) return;
         //원래 부모와 위치를 기억
         originalParent = transform.parent;
         originalPos = rect.anchoredPosition;
@@ -61,6 +66,8 @@ public class CardHover : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
+        //자신의 턴이 아니면 return
+        if (!IsDragAble()) return;
         //eventData.delta : 이전프레임과 지금프레임 사이에 포인터가 얼마만큼 움직였는지 (픽셀단위)
         //canvas.scaleFactor : Canvas에 있는 컴포넌트중 Canvas Scaler의 해상도에 따라 UI가 자동 확대/축소중이므로
         rect.anchoredPosition += eventData.delta / canvas.scaleFactor;
@@ -68,6 +75,8 @@ public class CardHover : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        //자신의 턴이 아니면 return
+        if (!IsDragAble()) return;
         //카드 냈을때
         if (rect.position.y > _submitCardLine.position.y)
         {
@@ -80,5 +89,11 @@ public class CardHover : MonoBehaviour,
             rect.anchoredPosition = originalPos;
         }
 
+    }
+
+    private bool IsDragAble()
+    {
+        //현재 자신의 ID로 자신의 턴인지 확인한다
+        return GameManager.Instance.turnManager.IsMyTurn(GameManager.Instance.playerManager.PlayerID);
     }
 }

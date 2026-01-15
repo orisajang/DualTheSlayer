@@ -5,7 +5,7 @@ using UnityEngine;
 
 public interface ICardMVPView
 {
-    public void SetCardData(CardInstance cardInstance);
+    public void SetCardResource(Sprite sprite, string text);
 }
 
 
@@ -17,5 +17,9 @@ public class CardPresenter
     {
         cardModel = model;
         cardView = view;
+    }
+    public void UpdateCardUI()
+    {
+        cardView.SetCardResource(cardModel.CardInstance.CardData.CardImage, cardModel.CardInstance.CardData.Description);
     }
 }
