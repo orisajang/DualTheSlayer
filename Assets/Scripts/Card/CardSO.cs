@@ -22,10 +22,13 @@ public class CardSO : ScriptableObject
     [SerializeField] private string description; //카드 설명
     [SerializeField] private eTargetType targetAble; //타게팅 가능한 스킬인지
 
+    [SerializeField] CardExecuteSO executeSO;
+
     public string CardName => cardName;
     public int Cost => cost;
     public eCardType CardType => cardType;
     public Sprite CardImage => cardImage;
     public string Description => description;
     public eTargetType TargetAble => targetAble;
+    public CardExecuteSO ExecuteSO => executeSO;
 }

@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 6576010960823525209}
   - component: {fileID: 8955121451194923674}
   - component: {fileID: 8553948863642408160}
-  - component: {fileID: 1743248024356831313}
+  - component: {fileID: 2838757643374882746}
+  - component: {fileID: 1947199898423236967}
   m_Layer: 5
   m_Name: CardPrefab
   m_TagString: Untagged
@@ -107,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hoverScale: 1.5
   cardView: {fileID: 8955121451194923674}
---- !u!114 &1743248024356831313
+--- !u!114 &2838757643374882746
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -116,13 +117,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 1730758409424322525}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1b6cb2cf2e2ebb429064e29833fe287, type: 3}
+  m_Script: {fileID: 11500000, guid: bc06f85c864959b46a782075f6b325ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cardView: {fileID: 8955121451194923674}
   _layer:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &1947199898423236967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730758409424322525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 535da86db6c89be4190336c4521a1906, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardHover: {fileID: 8553948863642408160}
+  cardArrorwUI: {fileID: 2838757643374882746}
+  cardView: {fileID: 8955121451194923674}
 --- !u!1 &6764006531920401035
 GameObject:
   m_ObjectHideFlags: 0

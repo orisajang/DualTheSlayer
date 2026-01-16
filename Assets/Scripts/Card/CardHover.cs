@@ -2,10 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardHover : MonoBehaviour,
-    IPointerEnterHandler, IPointerExitHandler,
-    IPointerDownHandler, IPointerUpHandler,
-    IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardHover : MonoBehaviour
 {
     //선택한 카드가 뭔지 보이게 하기위해 마우스를 올리거나 클릭했을때 카드가 커져보이게 만드는 기능
     //PC 마우스클릭(호버링)에 대응하기위해서 IPointerEnterHandler, 나갔을때 IPointerExitHandler
@@ -26,7 +23,7 @@ public class CardHover : MonoBehaviour,
 
     //드래그했을때 카드가 이동되어야하는지 판별하는 코드
     [SerializeField] CardView cardView;
-    eTargetType targetType;
+    //eTargetType targetType;
 
     private void Awake()
     {
@@ -38,32 +35,27 @@ public class CardHover : MonoBehaviour,
     public void Init(RectTransform transform)
     {
         _submitCardLine = transform;
-        targetType = cardView.GetTargetType();
     }
-    public void OnPointerEnter(PointerEventData eventData)
+    public void PointerEnter(PointerEventData eventData)
     {
         transform.localScale = originalScale * hoverScale;
     }
-    public void OnPointerExit(PointerEventData eventData)
+    public void PointerExit(PointerEventData eventData)
     {
         transform.localScale = originalScale;
     }
-    public void OnPointerDown(PointerEventData eventData)
+    public void PointerDown(PointerEventData eventData)
     {
         transform.localScale = originalScale * hoverScale;
     }
-    public void OnPointerUp(PointerEventData eventData)
+    public void PointerUp(PointerEventData eventData)
     {
         transform.localScale = originalScale;
     }
 
     //드래그 시작
-    public void OnBeginDrag(PointerEventData eventData)
+    public void BeginDrag(PointerEventData eventData)
     {
-        //타겟팅 스킬인경우 화살표 UI가 나와야해서 return
-        if (targetType != eTargetType.NotTarget) return;
-        //자신의 턴이 아니면 return
-        if (!IsDragAble()) return;
         //원래 부모와 위치를 기억
         originalParent = transform.parent;
         originalPos = rect.anchoredPosition;
@@ -72,23 +64,15 @@ public class CardHover : MonoBehaviour,
         transform.SetAsLastSibling(); //??
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void Drag(PointerEventData eventData)
     {
-        //타겟팅 스킬인경우 화살표 UI가 나와야해서 return
-        if (targetType != eTargetType.NotTarget) return;
-        //자신의 턴이 아니면 return
-        if (!IsDragAble()) return;
         //eventData.delta : 이전프레임과 지금프레임 사이에 포인터가 얼마만큼 움직였는지 (픽셀단위)
         //canvas.scaleFactor : Canvas에 있는 컴포넌트중 Canvas Scaler의 해상도에 따라 UI가 자동 확대/축소중이므로
         rect.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    public void EndDrag(PointerEventData eventData)
     {
-        //타겟팅 스킬인경우 화살표 UI가 나와야해서 return
-        if (targetType != eTargetType.NotTarget) return;
-        //자신의 턴이 아니면 return
-        if (!IsDragAble()) return;
         //카드 냈을때
         if (rect.position.y > _submitCardLine.position.y)
         {
@@ -106,11 +90,5 @@ public class CardHover : MonoBehaviour,
             rect.anchoredPosition = originalPos;
         }
 
-    }
-
-    private bool IsDragAble()
-    {
-        //현재 자신의 ID로 자신의 턴인지 확인한다
-        return GameManager.Instance.turnManager.IsMyTurn(GameManager.Instance.playerManager.PlayerID);
     }
 }

@@ -26,4 +26,9 @@ public class CardPresenter
     {
         return cardModel.CardInstance.CardData.TargetAble;
     }
+
+    public void ExecuteCard(Enemy enemy)
+    {
+        cardModel.CardInstance.CardData.ExecuteSO.Execute();
+    }
 }

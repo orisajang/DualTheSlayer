@@ -58,8 +58,10 @@ public class PlayerManager : MonoBehaviour
         //카드 Hover할때도 넣어주자
         CardHover cardHover = cardView.GetComponent<CardHover>();
         cardHover.Init(useCardLine);
-        //다음에 뭔가 스크립트 짤때마다 여기서 계속 초기화??
-        CardArrorUI arrorUI = cardView.GetComponent<CardArrorUI>();
+        //다음에 뭔가 스크립트 짤때마다 여기서 계속 초기화
+        CardArrorwUI arrorUI = cardView.GetComponent<CardArrorwUI>();
         arrorUI.Init();
+        CardInputController cardInputController = cardView.GetComponent<CardInputController>();
+        cardInputController.Init();
     }
 }

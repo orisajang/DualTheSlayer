@@ -4,9 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardArrorUI : MonoBehaviour,
-    IPointerDownHandler, IDragHandler, IPointerUpHandler,
-    IEndDragHandler
+public class CardArrorwUI : MonoBehaviour
 {
     //카드를 클릭하면 화살표UI가 나와서 타게팅 가능하도록
     UITargetArrow arrow;
@@ -33,24 +31,16 @@ public class CardArrorUI : MonoBehaviour,
         targetType = cardView.GetTargetType();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void PointerDown(PointerEventData eventData)
     {
-        //타겟팅 스킬이 아니면 return
-        if (targetType != eTargetType.Target) return;
-        //자신의 턴이 아니면 return
-        if (!IsDragAble()) return;
         arrow.Show(rect.position, eventData.position);
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public void Drag(PointerEventData eventData)
     {
-        //타겟팅 스킬이 아니면 return
-        if (targetType != eTargetType.Target) return;
-        //자신의 턴이 아니면 return
-        if (!IsDragAble()) return;
         arrow.Show(rect.position, eventData.position);
     }
-    public void OnEndDrag(PointerEventData eventData)
+    public void EndDrag(PointerEventData eventData)
     {
         //드래그가 끝났을때 사용. (Up에서 실제로 드래그가 발생했을때만 호출하기위해서 EndDrag사용)
         Ray ray = Camera.main.ScreenPointToRay(eventData.position);
@@ -64,24 +54,17 @@ public class CardArrorUI : MonoBehaviour,
             if(enemy != null)
             {
                 Debug.Log("준비 완료");
+                //현재 들어있는 카드의 정보를 가지고와서. 그 카드를 hit.transform에 실행해주자
+                cardView.ExecuteCommand(enemy);
             }
 
         }
 
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public void PointerUp(PointerEventData eventData)
     {
-        //타겟팅 스킬이 아니면 return
-        if (targetType != eTargetType.Target) return;
-        //자신의 턴이 아니면 return
-        if (!IsDragAble()) return;
         arrow.Hide();
-    }
-    private bool IsDragAble()
-    {
-        //현재 자신의 ID로 자신의 턴인지 확인한다
-        return GameManager.Instance.turnManager.IsMyTurn(GameManager.Instance.playerManager.PlayerID);
     }
 
     

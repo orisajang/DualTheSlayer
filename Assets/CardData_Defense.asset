@@ -18,3 +18,4 @@ MonoBehaviour:
   cardImage: {fileID: 21300000, guid: 8b7017b634e01d346a3a37b166dcd567, type: 3}
   description: Defense!!
   targetAble: 1
+  executeSO: {fileID: 11400000, guid: 55a720a662290c448b1075323f60ad0f, type: 2}
