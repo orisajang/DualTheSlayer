@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Card/CardExecute/Defense", fileName = "CardExecuteDefenseData")]
 public class CardExecuteDefenseSO : CardExecuteSO
 {
-    public override void Execute()
+    public override void Execute(CardView cardView)
     {
         Debug.Log("Defense");
     }

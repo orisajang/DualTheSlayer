@@ -37,7 +37,12 @@ public class CardView : MonoBehaviour, ICardMVPView
     //임시용-> 매개변수 player로 바꿔야함. 적이 들어오면 Presenter에 해당정보를 보내줘서 알아서 현재 카드를 실행하게 한다
     public void ExecuteCommand(Enemy enemy)
     {
-        cardPresenter.ExecuteCard(enemy);
+        cardPresenter.ExecuteCard(enemy, this);
+    }
+    //자신, 혹은 전체에 사용
+    public void ExecuteCommand()
+    {
+        cardPresenter.ExecuteCard(this);
     }
 
 }

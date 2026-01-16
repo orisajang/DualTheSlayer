@@ -81,7 +81,7 @@ public class CardHover : MonoBehaviour
             //카드를 일정범위이상으로 끌면 화살표 UI가 나오면서 대상을 선택할 수 있음. 공격,힐 같이 단일 선택이면 화살표가 나오게 해야할듯. 전체공격이면 화살표 안나와도됨 
             //전투? 전투를 관리하는 배틀매니저? -> 공격이다. 공격 데미지 계산. 힐이다. 힐 계산 상대를 어떻게 아는데???, 클릭으로 공격할 대상을 지정?
             //CardView cardView = GetComponent<CardView>();
-
+            cardView.ExecuteCommand();
         }
         else //카드를 낸게 아니라면
         {

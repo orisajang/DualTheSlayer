@@ -27,8 +27,15 @@ public class CardPresenter
         return cardModel.CardInstance.CardData.TargetAble;
     }
 
-    public void ExecuteCard(Enemy enemy)
+    public void ExecuteCard(Enemy enemy, CardView view)
     {
-        cardModel.CardInstance.CardData.ExecuteSO.Execute();
+        //적의 hp, 나의 공격력들을 받아서 BattleManager에 데미지 계산한후에 적용시키는 로직 필요
+        cardModel.CardInstance.CardData.ExecuteSO.Execute(view);
+        CardSpawner.Instance.ReturnCardToPool(view);
+    }
+    public void ExecuteCard(CardView view)
+    {
+        cardModel.CardInstance.CardData.ExecuteSO.Execute(view);
+        CardSpawner.Instance.ReturnCardToPool(view);
     }
 }

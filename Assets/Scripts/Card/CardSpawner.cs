@@ -23,10 +23,8 @@ public class CardSpawner : Singleton<CardSpawner>
         return cardBuf;
     }
     //오브젝트 반환
-    private void ReturnExpPointToPool(CardView expPoint)
+    public void ReturnCardToPool(CardView expPoint)
     {
-
-
         _cardPool.ReturnObject(expPoint);
     }
 }
