@@ -120,6 +120,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardView: {fileID: 8955121451194923674}
+  _layer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &6764006531920401035
 GameObject:
   m_ObjectHideFlags: 0
