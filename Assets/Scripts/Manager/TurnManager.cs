@@ -26,7 +26,7 @@ public class TurnManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        GameManager.Instance.DeleteTurnManager();
+        GameManager.Instance.DeleteTurnManager(this);
     }
 
 }

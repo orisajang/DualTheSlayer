@@ -28,7 +28,7 @@ public class PlayerManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        GameManager.Instance.DeletePlayerManager();
+        GameManager.Instance.DeletePlayerManager(this);
     }
 
     private void Start()
@@ -37,21 +37,29 @@ public class PlayerManager : MonoBehaviour
         //플레이어 초기 손패 5개 넣음
         for(int index = 0; index < startCardCount; index++)
         {
-            //카드 데이터 가져오기
-            CardSO cardSOData = playerDeck.GetCard();
-            //카드 인스턴스 생성
-            CardInstance instance = new CardInstance(cardSOData);
-            playerHand.Add(item: cardSOData);
-            //테스트용. 이곳에 소환해본다
-            GameObject cardObj = Instantiate(cardPrefab, _cardSpawnPosition);
-            //이제 MVP에 있는곳 코드랑 연관해서 카드정보를 Set
-            CardView cardView = cardObj.GetComponent<CardView>();
-            //초기화 (View를 초기화하면 안의 presenter과 Model도 생성및 초기화해줌)
-            cardView.Init(instance);
-            //카드 Hover할때도 넣어주자
-            CardHover cardHover = cardObj.GetComponent<CardHover>();
-            cardHover.Init(useCardLine);
+            SetPlayerHand();
         }
         Debug.Log(playerHand.Count);
+    }
+    public void SetPlayerHand()
+    {
+        //카드 데이터 가져오기
+        CardSO cardSOData = playerDeck.GetCard();
+        //카드 인스턴스 생성 (현재 카드의 코스트가 감소할수있으므로 인스턴스를 만들어서 원본 데이터와 따로 관리
+        CardInstance instance = new CardInstance(cardSOData);
+        //손패에 추가 (List)
+        playerHand.Add(cardSOData);
+        //테스트용. 소환해본다
+        CardView cardView = CardSpawner.Instance.GetCardByPool();
+        //이제 MVP에 있는곳 코드랑 연관해서 카드정보를 Set
+        //초기화 (View를 초기화하면 안의 presenter과 Model도 생성및 초기화해줌)
+        //추후에 초기화하는 스크립트(Card안에 스크립트를 직렬화하고, 모아주는 스크립트 필요할듯?)
+        cardView.Init(instance);
+        //카드 Hover할때도 넣어주자
+        CardHover cardHover = cardView.GetComponent<CardHover>();
+        cardHover.Init(useCardLine);
+        //다음에 뭔가 스크립트 짤때마다 여기서 계속 초기화??
+        CardArrorUI arrorUI = cardView.GetComponent<CardArrorUI>();
+        arrorUI.Init();
     }
 }

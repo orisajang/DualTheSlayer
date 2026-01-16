@@ -17,3 +17,4 @@ MonoBehaviour:
   cardType: 1
   cardImage: {fileID: 21300000, guid: 8b7017b634e01d346a3a37b166dcd567, type: 3}
   description: Defense!!
+  targetAble: 1

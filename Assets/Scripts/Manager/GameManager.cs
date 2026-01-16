@@ -7,6 +7,8 @@ public class GameManager : Singleton<GameManager>
     public TurnManager turnManager { get; private set; }
     public PlayerManager playerManager { get; private set; }
 
+    public TargetingManager targetingManager { get; private set; }
+
     protected override void Awake()
     {
         isDestroyOnLoad = false;
@@ -26,7 +28,7 @@ public class GameManager : Singleton<GameManager>
     {
         turnManager = turnMgr;
     }
-    public void DeleteTurnManager()
+    public void DeleteTurnManager(TurnManager turnMgr)
     {
         turnManager = null;
     }
@@ -35,8 +37,17 @@ public class GameManager : Singleton<GameManager>
     {
         playerManager = playerMgr;
     }
-    public void DeletePlayerManager()
+    public void DeletePlayerManager(PlayerManager playerMgr)
     {
         playerManager = null;
+    }
+    //타겟팅 매니저 할당&해제
+    public void SetTargetingManager(TargetingManager targetMgr)
+    {
+        targetingManager = targetMgr;
+    }
+    public void DeleteTargetManager(TargetingManager targetMgr)
+    {
+        targetingManager = null;
     }
 }

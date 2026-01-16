@@ -28,5 +28,10 @@ public class CardView : MonoBehaviour, ICardMVPView
         cardImage.sprite = sprite;
         cardDescription.text = text;
     }
+    public eTargetType GetTargetType()
+    {
+        eTargetType type = cardPresenter.GetInputType();
+        return type;
+    }
 
 }

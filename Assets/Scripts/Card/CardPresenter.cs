@@ -22,4 +22,8 @@ public class CardPresenter
     {
         cardView.SetCardResource(cardModel.CardInstance.CardData.CardImage, cardModel.CardInstance.CardData.Description);
     }
+    public eTargetType GetInputType()
+    {
+        return cardModel.CardInstance.CardData.TargetAble;
+    }
 }

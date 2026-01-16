@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 4380200045284340347}
   - component: {fileID: 6914579966390625964}
   - component: {fileID: 6576010960823525209}
-  - component: {fileID: 8553948863642408160}
   - component: {fileID: 8955121451194923674}
+  - component: {fileID: 8553948863642408160}
+  - component: {fileID: 1743248024356831313}
   m_Layer: 5
   m_Name: CardPrefab
   m_TagString: Untagged
@@ -78,20 +79,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8553948863642408160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1730758409424322525}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab75af1eb5c3d5e4f96e02b5bac26871, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hoverScale: 1.5
-  _submitCardLine: {fileID: 0}
 --- !u!114 &8955121451194923674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,6 +93,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardImage: {fileID: 3906926125606470975}
   cardDescription: {fileID: 8251427163272802819}
+--- !u!114 &8553948863642408160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730758409424322525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab75af1eb5c3d5e4f96e02b5bac26871, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverScale: 1.5
+  cardView: {fileID: 8955121451194923674}
+--- !u!114 &1743248024356831313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730758409424322525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1b6cb2cf2e2ebb429064e29833fe287, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardView: {fileID: 8955121451194923674}
 --- !u!1 &6764006531920401035
 GameObject:
   m_ObjectHideFlags: 0
