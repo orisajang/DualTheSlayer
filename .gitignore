@@ -81,3 +81,9 @@ crashlytics-build.properties
 # Resources
 /[Aa]ssets/Resources/*
 !/[Aa]ssets/Resources/**/*.meta
+
+# Firebase Folder
+/[Aa]ssets/Firebase/*
+!/[Aa]ssets/Firebase/**/*.meta
+/[Aa]ssets/StreamingAssets/*
+!/[Aa]ssets/StreamingAssets/**/*.meta
