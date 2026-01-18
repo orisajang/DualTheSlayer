@@ -87,3 +87,7 @@ crashlytics-build.properties
 !/[Aa]ssets/Firebase/**/*.meta
 /[Aa]ssets/StreamingAssets/*
 !/[Aa]ssets/StreamingAssets/**/*.meta
+
+# Photon Folder
+/[Aa]ssets/Photon/*
+!/[Aa]ssets/Photon/**/*.meta
