@@ -10,6 +10,7 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
     [SerializeField] Button _gameStartButton;
     [SerializeField] Button _roomLeaveButton;
 
+    [SerializeField] RoomTestView roomTestview;
 
     private void Awake()
     {
@@ -25,7 +26,7 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
     public override void OnDisable()
     {
         base.OnDisable();
-        UIRoomManager.Instance.RemoveRoomNetworkManager(this);
+        if(UIRoomManager.isHaveInstance) UIRoomManager.Instance.RemoveRoomNetworkManager(this);
     }
     private void OnDestroy()
     {
@@ -56,4 +57,13 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
         //방장이 할 행동을 해야함. (시작버튼 활성화 등)
     }
 
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+        //roomTestview.RoomTest.LoadSeatsFromRoom();
+        //roomTestview.UIUpdate();
+        roomTestview.RoomTest.LoadSeatRoomData();
+        roomTestview.UIUpdateByData();
+
+        //커스텀 프로퍼티 정리하자
+    }
 }
