@@ -529,7 +529,7 @@ GameObject:
   - component: {fileID: 314188534}
   - component: {fileID: 314188533}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: roomTitleText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1074,7 +1074,7 @@ GameObject:
   - component: {fileID: 586633016}
   - component: {fileID: 586633015}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: _roomNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1600,6 +1600,7 @@ GameObject:
   - component: {fileID: 804484432}
   - component: {fileID: 804484434}
   - component: {fileID: 804484433}
+  - component: {fileID: 804484435}
   m_Layer: 5
   m_Name: RoomInfoPanel
   m_TagString: Untagged
@@ -1666,6 +1667,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 804484431}
   m_CullTransparentMesh: 1
+--- !u!114 &804484435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804484431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 644ac36f6eabc2549be28b60703ef9be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomNameText: {fileID: 586633015}
 --- !u!1001 &821840553
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1906,8 +1920,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1918268130}
   m_HandleRect: {fileID: 1918268129}
   m_Direction: 2
-  m_Value: 1.000002
-  m_Size: 0.9511322
+  m_Value: 1
+  m_Size: 0.9148041
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

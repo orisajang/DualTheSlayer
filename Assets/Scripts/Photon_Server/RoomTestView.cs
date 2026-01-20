@@ -32,6 +32,7 @@ public class RoomTestView : MonoBehaviour
         //플레이어 룸 정보 설정
         for(int i=0; i< playerSeatUI.Count; i++)
         {
+            //매번 GetComponet로 하는것 개선하려면 딕셔너리로 캐싱해두고 꺼내쓰자 (지금은 그냥 쓰기)
             PlayerInfoUIPrefab prefab = playerSeatUI[i].GetComponent<PlayerInfoUIPrefab>();
 
             string playerName = roomTest.PlayerSeats[i].playerId;
@@ -46,27 +47,6 @@ public class RoomTestView : MonoBehaviour
             string playerName = roomTest.SpectorSeats[i].playerId;
             string teamName = RoomTest.SPECTOR_SEATS;
             prefab.SetPlayerInfoUI(playerName, teamName);
-        }
-
-    }
-
-
-
-    public void UIUpdate()
-    {
-        IReadOnlyList<Seats> plySeatInfo = roomTest.PlayerSeats;
-
-        for(int index = 0; index< roomTest.PlayerSeats.Count; index++)
-        {
-            // playerSeatUI[index].;
-            PlayerInfoUIPrefab prefab = playerSeatUI[index].GetComponent<PlayerInfoUIPrefab>();
-            prefab.SetPlayerInfoUI(roomTest.PlayerSeats[index].playerId, "Player");
-        }
-
-        for(int index = 0; index< roomTest.SpectorSeats.Count; index++)
-        {
-            PlayerInfoUIPrefab prefab = spectorSeatUI[index].GetComponent<PlayerInfoUIPrefab>();
-            prefab.SetPlayerInfoUI(roomTest.SpectorSeats[index].playerId, "Spector");
         }
 
     }

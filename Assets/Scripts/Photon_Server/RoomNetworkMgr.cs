@@ -59,8 +59,6 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-        //roomTestview.RoomTest.LoadSeatsFromRoom();
-        //roomTestview.UIUpdate();
         roomTestview.RoomTest.LoadSeatRoomData();
         roomTestview.UIUpdateByData();
 
