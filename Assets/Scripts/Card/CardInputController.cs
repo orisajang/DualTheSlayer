@@ -28,7 +28,7 @@ public class CardInputController : MonoBehaviour,
     public void OnPointerExit(PointerEventData eventData)
     {
         //내턴이 아니면 return
-        if (!IsDragAble()) return;
+        //if (!IsDragAble()) return;
         cardHover.PointerExit(eventData);
     }
     public void OnBeginDrag(PointerEventData eventData)

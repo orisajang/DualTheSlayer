@@ -2,6 +2,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,7 +38,19 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
     //게임 시작 버튼을 누르면 특정 씬으로 이동해야한다.
     private void GameStart()
     {
-        PhotonNetwork.LoadLevel("InGameScene");
+        IReadOnlyList<Seats> playerInfo = roomTestview.GetPlayerSetInfo();
+
+
+        //네트워크 프로퍼티로 저장해야할듯. 불러와야함
+        Room room = PhotonNetwork.CurrentRoom;
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        string[] playerArray = new string[playerInfo.Count];
+        for(int index=0; index< playerArray.Length; index++)
+        {
+            playerArray[index] = playerInfo[index].playerId;
+        }
+        hash.Add(NetworkEventManager.GamePlayerId, playerArray);
+        room.SetCustomProperties(hash);
     }
     private void LeaveRoom()
     {
@@ -59,9 +72,16 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
 
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
     {
-        roomTestview.RoomTest.LoadSeatRoomData();
-        roomTestview.UIUpdateByData();
-
-        //커스텀 프로퍼티 정리하자
+        //커스텀 프로퍼티를 통해 룸 정보 변경되었다면 정리하자
+        if (propertiesThatChanged.ContainsKey(NetworkEventManager.PLAYER_SEATS) || propertiesThatChanged.ContainsKey(NetworkEventManager.SPECTOR_SEATS))
+        {
+            roomTestview.RoomTest.LoadSeatRoomData();
+            roomTestview.UIUpdateByData();
+        }
+        
+        if(propertiesThatChanged.ContainsKey(NetworkEventManager.GamePlayerId))
+        {
+            PhotonNetwork.LoadLevel("InGameScene");
+        }
     }
 }

@@ -1,12 +1,13 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : MonoBehaviourPunCallbacks
 {
     //플레이어의 HP.. 등등이 있어야한다 일단은 보류
     //플레이어 ID (포톤에서 불러와서 설정할 예정, 일단은 임시 아이디 넣자)
-    public int PlayerID { get; private set; } = 1001;
+    public string PlayerID { get; private set; }
     //플레이어의 덱
     PlayerDeck playerDeck;
     //플레이어 손패
@@ -15,31 +16,56 @@ public class PlayerManager : MonoBehaviour
     //시작 플레이 카드
     [SerializeField,Tooltip("플레이어 시작 카드 수")] int startCardCount = 5;
     [SerializeField] RectTransform _cardSpawnPosition;
-    [SerializeField] GameObject cardPrefab;
+    [SerializeField] GameObject _cardPrefab;
 
     //카드 내는 제한선
-    [SerializeField] RectTransform useCardLine;
+    [SerializeField] RectTransform _useCardLine;
 
-
-    //게임매니저에 자기자신을 설정해서 접근할수있도록
-    private void OnEnable()
+    public void Init(RectTransform cardSpawnPosition, GameObject cardPrefab, RectTransform useCardLine, string id)
     {
-        GameManager.Instance.SetPlayerManager(this);
-    }
-    private void OnDisable()
-    {
-        GameManager.Instance.DeletePlayerManager(this);
-    }
-
-    private void Start()
-    {
+        PlayerID = id;
+        //초기 설정
+        if (!photonView.IsMine) return;
+        _cardSpawnPosition = cardSpawnPosition;
+        _cardPrefab = cardPrefab;
+        _useCardLine = useCardLine;
+        //덱 설정
         playerDeck = GetComponent<PlayerDeck>();
         //플레이어 초기 손패 5개 넣음
-        for(int index = 0; index < startCardCount; index++)
+        for (int index = 0; index < startCardCount; index++)
         {
             SetPlayerHand();
         }
         Debug.Log(playerHand.Count);
+
+    }
+    
+
+    //게임매니저에 자기자신을 설정해서 접근할수있도록
+    public override void OnEnable()
+    {
+        if (!photonView.IsMine) return;
+        base.OnEnable();
+        //GameManager.Instance.SetPlayerManager(this);
+    }
+    public override void OnDisable()
+    {
+        if (!photonView.IsMine) return;
+        base.OnDisable();
+        //GameManager.Instance.DeletePlayerManager(this);
+    } 
+
+    private void Start()
+    {
+        
+        //if (!photonView.IsMine) return;
+        //playerDeck = GetComponent<PlayerDeck>();
+        ////플레이어 초기 손패 5개 넣음
+        //for(int index = 0; index < startCardCount; index++)
+        //{
+        //    SetPlayerHand();
+        //}
+        //Debug.Log(playerHand.Count);
     }
     public void SetPlayerHand()
     {
@@ -57,11 +83,13 @@ public class PlayerManager : MonoBehaviour
         cardView.Init(instance);
         //카드 Hover할때도 넣어주자
         CardHover cardHover = cardView.GetComponent<CardHover>();
-        cardHover.Init(useCardLine);
+        cardHover.Init(_useCardLine);
         //다음에 뭔가 스크립트 짤때마다 여기서 계속 초기화
         CardArrorwUI arrorUI = cardView.GetComponent<CardArrorwUI>();
         arrorUI.Init();
         CardInputController cardInputController = cardView.GetComponent<CardInputController>();
         cardInputController.Init();
     }
+
+    
 }

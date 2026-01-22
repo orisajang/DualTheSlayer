@@ -43,8 +43,7 @@ public class RoomTest
     public IReadOnlyList<Seats> SpectorSeats => spectorSeats;
 
     public Action<string> OnSeatChanged;
-    public const string PLAYER_SEATS = "Player";
-    public const string SPECTOR_SEATS = "Spector";
+    
     public RoomTest()
     {
         Init();
@@ -156,8 +155,8 @@ public class RoomTest
             spectorName[i] = spectorSeats[i].playerId != null ? spectorSeats[i].playerId : "";
         }
         //해쉬에 넣어준다. (키와 값을 설정하기 위해)
-        hash.Add(PLAYER_SEATS, playerName);
-        hash.Add(SPECTOR_SEATS, spectorName);
+        hash.Add(NetworkEventManager.PLAYER_SEATS, playerName);
+        hash.Add(NetworkEventManager.SPECTOR_SEATS, spectorName);
         //방 설정 저장
         room.SetCustomProperties(hash);
 
@@ -170,17 +169,17 @@ public class RoomTest
         //커스텀 프로퍼티 정보들을 불러온다
         ExitGames.Client.Photon.Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
 
-        if(hash.ContainsKey(PLAYER_SEATS))
+        if(hash.ContainsKey(NetworkEventManager.PLAYER_SEATS))
         {
-            string[] playerNameArray = (string[])hash[PLAYER_SEATS];
+            string[] playerNameArray = (string[])hash[NetworkEventManager.PLAYER_SEATS];
             for(int i=0; i< playerNameArray.Length; i++)
             {
                 playerSeats[i].playerId = playerNameArray[i];
             }
         }
-        if(hash.ContainsKey(SPECTOR_SEATS))
+        if (hash.ContainsKey(NetworkEventManager.SPECTOR_SEATS))
         {
-            string[] spectorPlayerName = (string[])hash[SPECTOR_SEATS];
+            string[] spectorPlayerName = (string[])hash[NetworkEventManager.SPECTOR_SEATS];
             for(int i=0; i< spectorPlayerName.Length; i++)
             {
                 spectorSeats[i].playerId = spectorPlayerName[i];

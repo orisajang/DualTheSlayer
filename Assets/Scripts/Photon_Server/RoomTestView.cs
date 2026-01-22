@@ -36,7 +36,7 @@ public class RoomTestView : MonoBehaviour
             PlayerInfoUIPrefab prefab = playerSeatUI[i].GetComponent<PlayerInfoUIPrefab>();
 
             string playerName = roomTest.PlayerSeats[i].playerId;
-            string teamName = RoomTest.PLAYER_SEATS;
+            string teamName = NetworkEventManager.PLAYER_SEATS;
 
             prefab.SetPlayerInfoUI(playerName, teamName);
         }
@@ -45,9 +45,12 @@ public class RoomTestView : MonoBehaviour
         {
             PlayerInfoUIPrefab prefab = spectorSeatUI[i].GetComponent<PlayerInfoUIPrefab>();
             string playerName = roomTest.SpectorSeats[i].playerId;
-            string teamName = RoomTest.SPECTOR_SEATS;
+            string teamName = NetworkEventManager.SPECTOR_SEATS;
             prefab.SetPlayerInfoUI(playerName, teamName);
         }
-
+    }
+    public IReadOnlyList<Seats> GetPlayerSetInfo()
+    {
+        return roomTest.PlayerSeats;
     }
 }

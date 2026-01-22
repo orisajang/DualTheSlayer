@@ -61,7 +61,7 @@ public class CardHover : MonoBehaviour
         originalPos = rect.anchoredPosition;
         //Grid와 Layout 영향 제거
         transform.SetParent(canvas.transform);
-        transform.SetAsLastSibling(); //??
+        transform.SetAsLastSibling(); //Hierachy에서 맨뒤로 보냄
     }
 
     public void Drag(PointerEventData eventData)
