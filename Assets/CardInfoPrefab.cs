@@ -11,7 +11,7 @@ public class CardInfoPrefab : MonoBehaviour
     [SerializeField] TextMeshProUGUI _cost;
 
 
-    CardDataTestSO cardData;
+    public CardDataTestSO cardData { get; private set; }
 
 
     public void SetCardData(CardDataTestSO data)

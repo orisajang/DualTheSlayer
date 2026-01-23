@@ -14,6 +14,9 @@ public class CardDeckMoveScript : MonoBehaviour,
     ScrollRect _scrollRectParent;
 
     CanvasGroup _canvasgroup;
+
+    public Transform OriginParent => _originParent;
+
     private void Awake()
     {
         _canvas = GetComponentInParent<Canvas>();
@@ -28,6 +31,9 @@ public class CardDeckMoveScript : MonoBehaviour,
         _originParent = gameObject.transform.parent;
         gameObject.transform.SetParent(_canvas.transform);
         transform.position = eventData.position;
+
+        //현재 스코롤바가
+
     }
 
     public void OnDrag(PointerEventData eventData)
