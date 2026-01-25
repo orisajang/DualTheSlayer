@@ -28,6 +28,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public int currentHp;
     public int shield;
     //기타 상태이상들
+    public int AttackBufValue;
 
     //플레이어의 HP바
     [SerializeField] PlayerHpBar _playerHpBar;
@@ -38,8 +39,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         exp = levelData.exp;
         maxHp = levelData.level * 10;
         currentHp = maxHp;
+        shield = 0;
 
-        _playerHpBar.UpdateHPBarInfo(maxHp / currentHp, currentHp);
+        UpdateHpBar();
     }
 
     //public void Init(RectTransform cardSpawnPosition, GameObject cardPrefab, RectTransform useCardLine, string id, List<CardSOClass> deck)
@@ -78,19 +80,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         base.OnDisable();
         GameManager.Instance.DeletePlayerManager(this);
     } 
-
-    private void Start()
-    {
-        
-        //if (!photonView.IsMine) return;
-        //playerDeck = GetComponent<PlayerDeck>();
-        ////플레이어 초기 손패 5개 넣음
-        //for(int index = 0; index < startCardCount; index++)
-        //{
-        //    SetPlayerHand();
-        //}
-        //Debug.Log(playerHand.Count);
-    }
     public void SetPlayerHand()
     {
         //카드 데이터 가져오기
@@ -114,6 +103,22 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         CardInputController cardInputController = cardView.GetComponent<CardInputController>();
         cardInputController.Init();
     }
+    public void UpdateHpBar()
+    {
+        _playerHpBar.UpdateHPBarInfo(maxHp / currentHp, currentHp, shield);
+    }
 
+    //쉴드 생성
+    public void AddPlayerShield(int amount)
+    {
+        shield += amount;
+        UpdateHpBar();
+    }
+    //공격 받음
+    public void TakeDamage(int amount)
+    {
+        currentHp -= amount;
+        UpdateHpBar();
+    }
     
 }

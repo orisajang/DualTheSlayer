@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a219aa7ffb3d4054fb221e981da64580, type: 3}
   m_Name: CardExecuteAttackData
   m_EditorClassIdentifier: 
+  amount: 5

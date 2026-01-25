@@ -1,3 +1,4 @@
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -35,14 +36,42 @@ public class CardView : MonoBehaviour, ICardMVPView
     }
 
     //임시용-> 매개변수 player로 바꿔야함. 적이 들어오면 Presenter에 해당정보를 보내줘서 알아서 현재 카드를 실행하게 한다
-    public void ExecuteCommand(Enemy enemy)
+    public void ExecuteCommand(PlayerManager enemyPlayer)
     {
-        cardPresenter.ExecuteCard(enemy, this);
+        //무조건 자신한테 사용하는 버프 효과 (쉴드, 데미지증가, 힘증가)
+        //사용자, 타겟, 
+        string player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
+        PlayerManager myPlayer = GameManager.Instance.playerManager;
+        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, enemyPlayer);
+        cardPresenter.ExecuteCard(this, cardTargetInfoClass);
+        //CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
+        //cardPresenter.ExecuteCard(enemy, this, );
     }
     //자신, 혹은 전체에 사용
     public void ExecuteCommand()
     {
-        cardPresenter.ExecuteCard(this);
+        //무조건 자신한테 사용하는 버프 효과 (쉴드, 데미지증가, 힘증가)
+        //사용자, 타겟, 
+        string player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
+        PlayerManager myPlayer = GameManager.Instance.playerManager;
+        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
+
+
+        cardPresenter.ExecuteCard(this, cardTargetInfoClass);
     }
 
 }
+
+public class CardTargetInfoClass
+{
+    //카드 사용자와 타겟의 정보를 담은 클래스 
+    public PlayerManager UseCardPlayer { get; private set; }
+    public PlayerManager TargetPlayer { get; private set; }
+    public CardTargetInfoClass(PlayerManager user, PlayerManager target)
+    {
+        UseCardPlayer = user;
+        TargetPlayer = target;
+    }
+}
+
+
