@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     //플레이어의 덱
     PlayerDeck playerDeck;
     //플레이어 손패
-    List<CardSO> playerHand = new List<CardSO>();
+    List<CardSOClass> playerHand = new List<CardSOClass>();
 
     //시작 플레이 카드
     [SerializeField,Tooltip("플레이어 시작 카드 수")] int startCardCount = 5;
@@ -21,23 +21,47 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     //카드 내는 제한선
     [SerializeField] RectTransform _useCardLine;
 
-    public void Init(RectTransform cardSpawnPosition, GameObject cardPrefab, RectTransform useCardLine, string id)
+    //플레이어의 스탯
+    public int level;
+    public int exp;
+    public int maxHp;
+    public int currentHp;
+    public int shield;
+    //기타 상태이상들
+
+    //플레이어의 HP바
+    [SerializeField] PlayerHpBar _playerHpBar;
+
+    public void InitPlayerStat(PlayerLevelData levelData)
     {
-        PlayerID = id;
+        level = levelData.level;
+        exp = levelData.exp;
+        maxHp = levelData.level * 10;
+        currentHp = maxHp;
+
+        _playerHpBar.UpdateHPBarInfo(maxHp / currentHp, currentHp);
+    }
+
+    //public void Init(RectTransform cardSpawnPosition, GameObject cardPrefab, RectTransform useCardLine, string id, List<CardSOClass> deck)
+    public void Init(PlayerConfig config)
+    {
+        PlayerID = config.id;
         //초기 설정
         if (!photonView.IsMine) return;
-        _cardSpawnPosition = cardSpawnPosition;
-        _cardPrefab = cardPrefab;
-        _useCardLine = useCardLine;
+        _cardSpawnPosition = config.cardSpawnPosition;
+        _cardPrefab = config.cardPrefab;
+        _useCardLine = config.useCardLine;
         //덱 설정
         playerDeck = GetComponent<PlayerDeck>();
+        playerDeck.SetCard(config.deck);
         //플레이어 초기 손패 5개 넣음
         for (int index = 0; index < startCardCount; index++)
         {
             SetPlayerHand();
         }
         Debug.Log(playerHand.Count);
-
+        //플레이어 정보 설정
+        InitPlayerStat(config.levelData);
     }
     
 
@@ -46,13 +70,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         if (!photonView.IsMine) return;
         base.OnEnable();
-        //GameManager.Instance.SetPlayerManager(this);
+        GameManager.Instance.SetPlayerManager(this);
     }
     public override void OnDisable()
     {
         if (!photonView.IsMine) return;
         base.OnDisable();
-        //GameManager.Instance.DeletePlayerManager(this);
+        GameManager.Instance.DeletePlayerManager(this);
     } 
 
     private void Start()
@@ -70,7 +94,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public void SetPlayerHand()
     {
         //카드 데이터 가져오기
-        CardSO cardSOData = playerDeck.GetCard();
+        CardSOClass cardSOData = playerDeck.GetCard();
         //카드 인스턴스 생성 (현재 카드의 코스트가 감소할수있으므로 인스턴스를 만들어서 원본 데이터와 따로 관리
         CardInstance instance = new CardInstance(cardSOData);
         //손패에 추가 (List)

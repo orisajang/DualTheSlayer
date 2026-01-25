@@ -20,8 +20,6 @@ public class RoomTestView : MonoBehaviour
     private void Awake()
     {
         roomTest = new RoomTest();
-
-        //roomTest.OnSeatChanged += PhotonNetwokUpdate;
         playerTeamButton.onClick.AddListener(roomTest.MovePlayerTeam);
         spectorTeamButton.onClick.AddListener(roomTest.MoveSpectorTeam);
 

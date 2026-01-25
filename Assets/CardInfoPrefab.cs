@@ -11,14 +11,14 @@ public class CardInfoPrefab : MonoBehaviour
     [SerializeField] TextMeshProUGUI _cost;
 
 
-    public CardDataTestSO cardData { get; private set; }
+    public CardSO cardData { get; private set; }
 
 
-    public void SetCardData(CardDataTestSO data)
+    public void SetCardData(CardSO data)
     {
         cardData = data;
 
-        _image.sprite = cardData.Image;
+        _image.sprite = cardData.CardImage;
         _cardName.text = cardData.CardName;
         _cost.text = cardData.Cost.ToString();
 

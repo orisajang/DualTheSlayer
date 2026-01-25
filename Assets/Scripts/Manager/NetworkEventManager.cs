@@ -1,3 +1,5 @@
+using Firebase.Auth;
+using Firebase.Database;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
@@ -16,6 +18,29 @@ public class NetworkEventManager : MonoBehaviourPunCallbacks
     public const string GamePlayerId = "GamePlayerID";
     public const string PLAYER_SEATS = "Player";
     public const string SPECTOR_SEATS = "Spector";
+    public const string IsPlayer = "IsPlayer";
+    public const string SeatIndex = "SeatIndex";
+    
+
+
+    //전역에서 쓰는 덱 주소경로
+    public DatabaseReference GetDeckRef()
+    {
+        FirebaseUser user = FirebaseAuthMgr.user;
+        return FirebaseAuthMgr.dbRef.Child("users").Child(user.UserId).Child("deck");
+    }
+    //전역에서 쓰는 인벤토리 주소 경로
+    public DatabaseReference GetInvenRef()
+    {
+        FirebaseUser user = FirebaseAuthMgr.user;
+        return FirebaseAuthMgr.dbRef.Child("users").Child(user.UserId).Child("inven");
+    }
+    //전역에서 쓰는 플레이어 주소 경로
+    public DatabaseReference GetPlayerRef()
+    {
+        FirebaseUser user = FirebaseAuthMgr.user;
+        return FirebaseAuthMgr.dbRef.Child("users").Child(user.UserId).Child("playerData");
+    }
 
     //게임할 플레이어아이디 저장
     private string[] playerIdArray;

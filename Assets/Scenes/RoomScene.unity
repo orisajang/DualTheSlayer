@@ -2757,6 +2757,7 @@ GameObject:
   m_Component:
   - component: {fileID: 827673859}
   - component: {fileID: 827673858}
+  - component: {fileID: 827673860}
   m_Layer: 0
   m_Name: RoomNetworkMgr
   m_TagString: Untagged
@@ -2794,6 +2795,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &827673860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827673857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 2
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &856330492
 GameObject:
   m_ObjectHideFlags: 0
@@ -2824,26 +2847,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardInitList:
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 16af5bb209add194bb775eddcb71e7a1, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 3783b16b9f5cacf48b999bff978301b0, type: 2}
-  - {fileID: 11400000, guid: 88f2119d36ce4e74e9bd29c094e98818, type: 2}
-  - {fileID: 11400000, guid: 88f2119d36ce4e74e9bd29c094e98818, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d8d718ac34aff174d98cc65d9d218e6f, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: d219b1d2287fb4a41af7bd131f238b13, type: 2}
+  - {fileID: 11400000, guid: 9c1b3e5f2142c3e4280f0efe46221d0e, type: 2}
+  - {fileID: 11400000, guid: 9c1b3e5f2142c3e4280f0efe46221d0e, type: 2}
+  - {fileID: 11400000, guid: 9c1b3e5f2142c3e4280f0efe46221d0e, type: 2}
   deckSettingPanel: {fileID: 96292529}
   deckParent: {fileID: 377381498}
   closeButton: {fileID: 1316701496}

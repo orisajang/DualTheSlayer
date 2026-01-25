@@ -28,8 +28,8 @@ public class CardHover : MonoBehaviour
     private void Awake()
     {
         originalScale = gameObject.transform.localScale;
-        //canvas = gameObject.GetComponentInParent<Canvas>();
-        canvas = InGameUIManager.Instance.MainCanvas;
+        canvas = gameObject.GetComponentInParent<Canvas>();
+        //canvas = InGameUIManager.Instance.MainCanvas;
         rect = GetComponent<RectTransform>();
     }
     public void Init(RectTransform transform)

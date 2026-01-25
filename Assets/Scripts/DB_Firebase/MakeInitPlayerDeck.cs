@@ -10,16 +10,13 @@ using UnityEngine.UI;
 
 public class MakeInitPlayerDeck:MonoBehaviour
 {
-    [SerializeField] List<CardDataTestSO> cardInitList;
+    [SerializeField] List<CardSO> cardInitList;
 
-    List<CardDataTestSO> currentPlayerDeck = new List<CardDataTestSO>();
+    List<CardSO> currentPlayerDeck = new List<CardSO>();
 
-    Dictionary<string, CardDataTestSO> cardInfoDic = new Dictionary<string, CardDataTestSO>();
-    DatabaseReference dbRef = FirebaseAuthMgr.dbRef;
+    Dictionary<string, CardSO> cardInfoDic = new Dictionary<string, CardSO>();
     DatabaseReference invenRef;
     DatabaseReference deckRef;
-
-    FirebaseUser user = FirebaseAuthMgr.user;
     //카드를 UI에 표시하자
     [SerializeField] GameObject deckSettingPanel;
     [SerializeField] Transform deckParent;
@@ -33,8 +30,10 @@ public class MakeInitPlayerDeck:MonoBehaviour
 
     private void Awake()
     {
-        invenRef = dbRef.Child("users").Child(user.UserId).Child("inven");
-        deckRef = dbRef.Child("users").Child(user.UserId).Child("deck");
+        //invenRef = dbRef.Child("users").Child(user.UserId).Child("inven");
+        //deckRef = dbRef.Child("users").Child(user.UserId).Child("deck");
+        invenRef = NetworkEventManager.Instance.GetInvenRef();
+        deckRef = NetworkEventManager.Instance.GetDeckRef();
     }
 
     private void OnEnable()
@@ -82,13 +81,13 @@ public class MakeInitPlayerDeck:MonoBehaviour
         CardInfoPrefab[] invenPrefabs = inventoryScrollviewContent.GetComponentsInChildren<CardInfoPrefab>().Where(c => c.gameObject != inventoryScrollviewContent).ToArray();
         for(int index =0; index < invenPrefabs.Length; index++)
         {
-            CardDataTestSO cardData = cardInfoDic[invenPrefabs[index].cardData.CardId];
+            CardSO cardData = cardInfoDic[invenPrefabs[index].cardData.CardId];
             invenCardList.Add(cardData.CardId);
         }
         CardInfoPrefab[] deckPrefabs = deckScrollviewContent.GetComponentsInChildren<CardInfoPrefab>().Where(c => c.gameObject != deckScrollviewContent).ToArray();
         for(int index = 0; index < deckPrefabs.Length; index++)
         {
-            CardDataTestSO cardData = cardInfoDic[deckPrefabs[index].cardData.CardId];
+            CardSO cardData = cardInfoDic[deckPrefabs[index].cardData.CardId];
             deckCardList.Add(cardData.CardId);
         }
         //2. 현재 저장된 리스트를 Firebase에 저장한다.
@@ -114,7 +113,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
         }
     }
 
-    public CardDataTestSO FindCardDataByID(string id)
+    public CardSO FindCardDataByID(string id)
     {
         if (!cardInfoDic.ContainsKey(id))
         {
@@ -142,7 +141,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
         //카드 데이터가 들어있음.
         //1. 데이터 안에 들어있는 정보중에서 카드ID만 빼와서 리스트에 넣는다
         List<string> cardIdList = new List<string>();
-        foreach(CardDataTestSO item in cardInitList)
+        foreach(CardSO item in cardInitList)
         {
             cardIdList.Add(item.CardId);
         }
@@ -158,8 +157,8 @@ public class MakeInitPlayerDeck:MonoBehaviour
     {
         //초기 딕셔너리 데이터들을 초기화
         //CardDataSO[] allCards = Resources.LoadAll<CardDataSO>("Cards"); ;
-        CardDataTestSO[] allCards = Resources.LoadAll<CardDataTestSO>("Cards");
-        foreach(CardDataTestSO cardData in allCards)
+        CardSO[] allCards = Resources.LoadAll<CardSO>("CardData");
+        foreach(CardSO cardData in allCards)
         {
             cardInfoDic.Add(cardData.CardId, cardData);
         }

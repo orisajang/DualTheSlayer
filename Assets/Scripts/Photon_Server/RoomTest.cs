@@ -42,7 +42,6 @@ public class RoomTest
     public IReadOnlyList<Seats> PlayerSeats => playerSeats;
     public IReadOnlyList<Seats> SpectorSeats => spectorSeats;
 
-    public Action<string> OnSeatChanged;
     
     public RoomTest()
     {
@@ -80,13 +79,8 @@ public class RoomTest
             //자리 설정
             playerSeats[seatIndex].SetSeatInfo(dbID, seatIndex, eSeatType.Player);
             seatDic[dbID] = playerSeats[seatIndex];
-
+            //커스텀 프로퍼티를 이용해서 현재 방설정을 전부 저장(서버에 보내줌)
             SaveSeatRoomData();
-
-            OnSeatChanged?.Invoke(eSeatType.Player.ToString());
-            //포톤 네트워크에 정보를 보냄
-
-            
         }
         
     }
@@ -107,7 +101,6 @@ public class RoomTest
 
             //포톤 네트워크에 정보를 보냄
             SaveSeatRoomData();
-            OnSeatChanged?.Invoke(eSeatType.Spector.ToString());
         }
         
     }
@@ -157,14 +150,14 @@ public class RoomTest
         //해쉬에 넣어준다. (키와 값을 설정하기 위해)
         hash.Add(NetworkEventManager.PLAYER_SEATS, playerName);
         hash.Add(NetworkEventManager.SPECTOR_SEATS, spectorName);
-        //방 설정 저장
+        //방 설정 저장 (RoomNetworkMgr에서 이벤트 발생시키고, 저장다되었으면 Load불러와서 갱신처리됨)
         room.SetCustomProperties(hash);
 
     }
-    
+    //서버에서 방 정보를 불러와서 데이터를 갱신해주기 위해서 사용
     public void LoadSeatRoomData()
     {
-        //방 정보를 불러와서 업데이트 해줘야함
+        
         if (PhotonNetwork.CurrentRoom == null) return;
         //커스텀 프로퍼티 정보들을 불러온다
         ExitGames.Client.Photon.Hashtable hash = PhotonNetwork.CurrentRoom.CustomProperties;
@@ -185,5 +178,20 @@ public class RoomTest
                 spectorSeats[i].playerId = spectorPlayerName[i];
             }
         }
+    }
+    //플레이어가 관전자인지, 아닌지 체크
+    public Seats ReturnPlayerType(string id)
+    {
+        Seats mySeat = new Seats();
+        mySeat.seatType = eSeatType.Spector; //초기 설정
+        foreach(Seats item in playerSeats)
+        {
+            if(item.playerId == id)
+            {
+                mySeat = item;
+                break;
+            }
+        }
+        return mySeat;
     }
 }
