@@ -8,7 +8,7 @@ public class PlayerConfig
     public RectTransform cardSpawnPosition;
     public GameObject cardPrefab;
     public RectTransform useCardLine;
-    public string id;
+    public int id;
     public List<CardSOClass> deck;
     public PlayerLevelData levelData;
 

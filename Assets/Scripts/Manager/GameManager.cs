@@ -86,12 +86,14 @@ public class GameManager : Singleton<GameManager>
                 cardSpawnPosition = _cardSpawnPosition,
                 cardPrefab = _cardPrefab,
                 useCardLine = _useCardLine,
-                id = ply.ActorNumber.ToString(),
+                id = ply.ActorNumber,
                 deck = deckCardList,
                 levelData = playerLevelData
             };
-            //해당 클래스를 넣어줌
+            //개인만 가지고있어야하는 설정을 Init로 만들음
             playerManager.Init(config);
+            //모두가 네트워크에 보여야하는것들 설정을 위해 RPC로 보냄
+            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.OthersBuffered, playerLevelData.level,playerLevelData.exp);
 
         }
     }

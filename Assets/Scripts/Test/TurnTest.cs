@@ -40,7 +40,7 @@ public class TurnTest : MonoBehaviour
                 if (ply.ActorNumber == currentPos)
                 {
                     Debug.Log($"{ply.ActorNumber}의 차례입니다");
-                    GameManager.Instance.turnManager.SetPlayerID(ply.ActorNumber.ToString());
+                    GameManager.Instance.turnManager.SetPlayerID(ply.ActorNumber);
                     //만약 자신 턴이라면
                     if (ply.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                     {

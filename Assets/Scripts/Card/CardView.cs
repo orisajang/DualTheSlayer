@@ -40,10 +40,11 @@ public class CardView : MonoBehaviour, ICardMVPView
     {
         //무조건 자신한테 사용하는 버프 효과 (쉴드, 데미지증가, 힘증가)
         //사용자, 타겟, 
-        string player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
+        int player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
         PlayerManager myPlayer = GameManager.Instance.playerManager;
         CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, enemyPlayer);
         cardPresenter.ExecuteCard(this, cardTargetInfoClass);
+
         //CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
         //cardPresenter.ExecuteCard(enemy, this, );
     }
@@ -52,7 +53,7 @@ public class CardView : MonoBehaviour, ICardMVPView
     {
         //무조건 자신한테 사용하는 버프 효과 (쉴드, 데미지증가, 힘증가)
         //사용자, 타겟, 
-        string player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
+        int player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
         PlayerManager myPlayer = GameManager.Instance.playerManager;
         CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
 

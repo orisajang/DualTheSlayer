@@ -35,7 +35,15 @@ public class CardPresenter
     }
     public void ExecuteCard(CardView view, CardTargetInfoClass cardTargetInfoClass)
     {
-        cardModel.CardInstance.CardData.ExecuteSO.Execute(cardTargetInfoClass);
-        CardSpawner.Instance.ReturnCardToPool(view);
+        bool isSuccess = cardModel.CardInstance.CardData.ExecuteSO.Execute(cardTargetInfoClass);
+        //타겟팅 카드의 경우 대상이 아니면 false보내고 카드실행 취소해야해서 bool판별해야함
+        if(isSuccess)
+        {
+            CardSpawner.Instance.ReturnCardToPool(view);
+        }
+        else
+        {
+            Debug.Log("카드 타겟대상이 틀렸습니다 확인해주세요. 실행취소");
+        }
     }
 }

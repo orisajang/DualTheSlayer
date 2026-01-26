@@ -56,6 +56,7 @@ public class CardArrorwUI : MonoBehaviour
                 Debug.Log("준비 완료");
                 //현재 들어있는 카드의 정보를 가지고와서. 그 카드를 hit.transform에 실행해주자
                 cardView.ExecuteCommand(enemyPlayer);
+
             }
 
         }
