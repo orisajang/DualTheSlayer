@@ -42,7 +42,8 @@ public class CardView : MonoBehaviour, ICardMVPView
         //사용자, 타겟, 
         int player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
         PlayerManager myPlayer = GameManager.Instance.playerManager;
-        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, enemyPlayer);
+        CardSOClass cardClass = cardPresenter.ReturnCardData();
+        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, enemyPlayer,cardClass.Cost);
         cardPresenter.ExecuteCard(this, cardTargetInfoClass);
 
         //CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
@@ -55,23 +56,11 @@ public class CardView : MonoBehaviour, ICardMVPView
         //사용자, 타겟, 
         int player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
         PlayerManager myPlayer = GameManager.Instance.playerManager;
-        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
+        CardSOClass cardClass = cardPresenter.ReturnCardData();
+        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer, cardClass.Cost);
 
 
         cardPresenter.ExecuteCard(this, cardTargetInfoClass);
-    }
-
-}
-
-public class CardTargetInfoClass
-{
-    //카드 사용자와 타겟의 정보를 담은 클래스 
-    public PlayerManager UseCardPlayer { get; private set; }
-    public PlayerManager TargetPlayer { get; private set; }
-    public CardTargetInfoClass(PlayerManager user, PlayerManager target)
-    {
-        UseCardPlayer = user;
-        TargetPlayer = target;
     }
 }
 

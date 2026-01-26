@@ -1,6 +1,8 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
@@ -22,12 +24,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //카드 내는 제한선
     [SerializeField] RectTransform _useCardLine;
 
+    //
+    [SerializeField] TextMeshProUGUI _energyTextUI;
+
     //플레이어의 스탯
     public int level;
     public int exp;
     public int maxHp;
     public int currentHp;
     public int shield;
+    public int energy;
     //기타 상태이상들
     public int AttackBufValue;
 
@@ -39,16 +45,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         return level * 10;
     }
 
-    public void InitPlayerStat(PlayerLevelData levelData)
-    {
-        level = levelData.level;
-        exp = levelData.exp;
-        maxHp = CalcMaxHP(levelData.level);
-        currentHp = maxHp;
-        shield = 0;
-
-        UpdateHpBar();
-    }
+    
 
     //public void Init(RectTransform cardSpawnPosition, GameObject cardPrefab, RectTransform useCardLine, string id, List<CardSOClass> deck)
     public void Init(PlayerConfig config)
@@ -69,10 +66,20 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         Debug.Log(playerHand.Count);
         //플레이어 정보 설정
-        InitPlayerStat(config.levelData);
+        //InitPlayerStat(config.levelData); //RPC로 다같이하면될듯.
+    }
+    public void InitPlayerStat(PlayerLevelData levelData)
+    {
+        level = levelData.level;
+        exp = levelData.exp;
+        maxHp = CalcMaxHP(levelData.level);
+        currentHp = maxHp;
+        shield = 0;
+
+        UpdateHpBar();
     }
     [PunRPC]
-    public void RPC_Init(int lvl, int expoint)
+    public void RPC_Init(int lvl, int expoint, PhotonMessageInfo info)
     {
         level = lvl;
         exp = expoint;
@@ -85,15 +92,21 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //게임매니저에 자기자신을 설정해서 접근할수있도록
     public override void OnEnable()
     {
-        if (!photonView.IsMine) return;
         base.OnEnable();
-        GameManager.Instance.SetPlayerManager(this);
+        //등록은 해주고 아래코드는 실행안함
+        GameManager.Instance.SetPlayerManager(this, photonView.Owner.ActorNumber);
+        if (!photonView.IsMine) return;
+        
+        //소유자의 번호를 넣어줘서 딕셔너리 등록할 수 있도록함
+        
     }
     public override void OnDisable()
     {
-        if (!photonView.IsMine) return;
         base.OnDisable();
-        GameManager.Instance.DeletePlayerManager(this);
+        GameManager.Instance.DeletePlayerManager(this, photonView.Owner.ActorNumber);
+        if (!photonView.IsMine) return;
+        
+        
     } 
     public void SetPlayerHand()
     {
@@ -118,6 +131,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         CardInputController cardInputController = cardView.GetComponent<CardInputController>();
         cardInputController.Init();
     }
+
+    public void SetEnergyTextUI(TextMeshProUGUI text)
+    {
+        _energyTextUI = text;
+    }
     public void UpdateHpBar()
     {
         //HP바 정보 업데이트
@@ -132,19 +150,42 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             hpratio = currentHp / (float)maxHp;
         }
         _playerHpBar.UpdateHPBarInfo(hpratio, currentHp, shield);
+
+
+        photonView.RPC(nameof(SetEnergyText), RpcTarget.AllBuffered, energy);
+        
+    }
+    [PunRPC]
+    public void SetEnergyText(int energyText)
+    {
+        if (_energyTextUI == null)
+        {
+            Debug.Log("텍스트가 null");
+            return;
+        }
+        
+        _energyTextUI.text = energyText.ToString();
+        energy--;
     }
 
     //쉴드 생성
-    public void AddPlayerShield(int amount)
+    public void AddPlayerShield(int amount,int CardCost)
     {
         shield += amount;
         UpdateHpBar();
+        //행동력 감소
+        DecreaseEnergy(CardCost);
     }
     //공격 받음
     public void TakeDamage(int amount)
     {
         photonView.RPC(nameof(TakeDamageRPC), RpcTarget.AllBuffered, amount);
         //TakeDamageRPC(amount);
+    }
+    //행동력 감소
+    public void DecreaseEnergy(int CardCost)
+    {
+        energy -= CardCost;
     }
 
     [PunRPC]

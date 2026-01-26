@@ -2,6 +2,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
     private int _currentPlayerIndex;
 
     [SerializeField] private Button _endTurnButton;
+
+    [SerializeField] private TextMeshProUGUI _energyText;
 
     private List<int> _plyIdArray = new List<int>();
     private void Start()
@@ -28,24 +31,45 @@ public class TurnManager : MonoBehaviourPunCallbacks
             }
         }
 
-        //초기 플레이어 랜덤으로 선택
-        _currentPlayerIndex = Random.Range(0, 2);
-        CurrentPlayerId = _plyIdArray[_currentPlayerIndex];
+        //초기 플레이어 랜덤으로 선택 (랜덤을 한곳에서 설정하고 보내줘야 서로 로컬에서 다르지않음.)
+        if(PhotonNetwork.IsMasterClient)
+        {
+            int randomPlayerIndex = Random.Range(0, _plyIdArray.Count);
+            photonView.RPC(nameof(SetFirstPlayerIndex), RpcTarget.AllBuffered, randomPlayerIndex);
+        }
+        
+        
 
         //초기 플레이어 턴 시작
-        InitPlayerTurnSetting();
+        //InitPlayerTurnSetting();
+        //StartCoroutine(InitPlayerTurnSetting());
     }
 
-    
-
-    private void InitPlayerTurnSetting()
+    [PunRPC]
+    public void SetFirstPlayerIndex(int index)
     {
+        _currentPlayerIndex = index;
+        CurrentPlayerId = _plyIdArray[_currentPlayerIndex];
+        StartCoroutine(InitPlayerTurnSetting());
+    }
+
+
+    //private void InitPlayerTurnSetting()
+    private IEnumerator InitPlayerTurnSetting()
+    {
+        //bool isPlayerMakeComplete = GameManager.Instance.IsPlayerInstantiateComplete();
+        Debug.Log("대기 시작");
+        yield return new WaitUntil(GameManager.Instance.IsPlayerInstantiateComplete);
+        Debug.Log("대기 종료");
         foreach (Player ply in PhotonNetwork.PlayerList)
         {
             if (ply.ActorNumber == CurrentPlayerId)
             {
                 //현재 플레이어의 ID 설정
                 //SetPlayerID(ply.ActorNumber);
+                PlayerManager playerManager = GameManager.Instance.PlayerInstanceDic[ply.ActorNumber];
+                playerManager.SetEnergyTextUI(_energyText);
+                Debug.Log($"현재턴 플레이어번호:{ply.ActorNumber} 내번호: {PhotonNetwork.LocalPlayer.ActorNumber}");
                 if (ply.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                 {
                     _endTurnButton.gameObject.SetActive(true);
@@ -70,7 +94,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         SetPlayerID(currentPlayerId);
 
         //다음 플레이어턴 시작
-        InitPlayerTurnSetting();
+        StartCoroutine(InitPlayerTurnSetting());
     }
 
     //현재 플레이 가능한 플레이어ID를 설정
@@ -86,15 +110,17 @@ public class TurnManager : MonoBehaviourPunCallbacks
         else return false;
     }
 
-    private void OnEnable()
+    public override void OnEnable()
     {
+        base.OnEnable();
         //자신이 활성화되면 동적으로 GameManager에 자신 등록
         GameManager.Instance.SetTurnManager(this);
         //버튼 이벤트
         _endTurnButton.onClick.AddListener(OnClickEndTurnButton);
     }
-    private void OnDisable()
+    public override void OnDisable()
     {
+        base.OnDisable();
         GameManager.Instance.DeleteTurnManager(this);
         _endTurnButton.onClick.RemoveAllListeners();
     }

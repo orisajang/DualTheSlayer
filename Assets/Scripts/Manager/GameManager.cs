@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
@@ -29,6 +30,10 @@ public class GameManager : Singleton<GameManager>
     {
         isDestroyOnLoad = false;
         base.Awake();
+
+        //플레이어 갯수 구함
+        _playerInstanceDic.Clear();
+        CalcPlayerCount();
     }
 
     Dictionary<string, CardSO> cardSODic = new Dictionary<string, CardSO>();
@@ -36,6 +41,28 @@ public class GameManager : Singleton<GameManager>
 
     //플레이어 레벨 정보
     PlayerLevelData playerLevelData;
+
+    //
+    private Dictionary<int, PlayerManager> _playerManagers = new Dictionary<int, PlayerManager>();
+    public IReadOnlyDictionary<int, PlayerManager> PlayerManagers => _playerManagers;
+    [SerializeField] public TextMeshProUGUI _energyText;
+    //현재 방의 플레이어 인원 (관전자 제외)
+    public int maxPlayerCount { get; private set; }
+    Dictionary<int, PlayerManager> _playerInstanceDic = new Dictionary<int, PlayerManager>();
+    public IReadOnlyDictionary<int, PlayerManager> PlayerInstanceDic => _playerInstanceDic;
+    //실제 플레이어가 몇명인지 확인 (플레이어가 모두 설정될때까지 대기하기 위해서)
+    public void CalcPlayerCount()
+    {
+        maxPlayerCount = 0;
+        foreach (Player ply in PhotonNetwork.PlayerList)
+        {
+            //플레이어라면?
+            if ((bool)ply.CustomProperties[NetworkEventManager.IsPlayer])
+            {
+                maxPlayerCount++;
+            }
+        }
+    }
 
     private IEnumerator Start()
     {
@@ -79,7 +106,7 @@ public class GameManager : Singleton<GameManager>
         if (isPlayer)
         {
             int spawnIndex = (int)ply.CustomProperties[NetworkEventManager.SeatIndex];
-            PlayerManager playerManager = PhotonNetwork.Instantiate(playerPrefab.name, spawnPositions[spawnIndex].position, Quaternion.identity).GetComponent<PlayerManager>();
+            playerManager = PhotonNetwork.Instantiate(playerPrefab.name, spawnPositions[spawnIndex].position, Quaternion.identity).GetComponent<PlayerManager>();
             //매개변수 1개로만 쓸수있도록 클래스 생성해서 하나로 담음(매개변수 순서 안지켜도됨)
             PlayerConfig config = new PlayerConfig
             {
@@ -90,11 +117,15 @@ public class GameManager : Singleton<GameManager>
                 deck = deckCardList,
                 levelData = playerLevelData
             };
+            _playerManagers.Add(ply.ActorNumber, playerManager);
+
             //개인만 가지고있어야하는 설정을 Init로 만들음
             playerManager.Init(config);
             //모두가 네트워크에 보여야하는것들 설정을 위해 RPC로 보냄
-            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.OthersBuffered, playerLevelData.level,playerLevelData.exp);
+            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.AllBuffered, playerLevelData.level,playerLevelData.exp);
 
+            int Num = GameManager.Instance.playerManager.PlayerID;
+            Debug.Log($"{Num}");
         }
     }
 
@@ -193,12 +224,30 @@ public class GameManager : Singleton<GameManager>
     {
         targetingManager = null;
     }
-    public void SetPlayerManager(PlayerManager playerMgr)
+
+    public bool IsPlayerInstantiateComplete()
     {
-        playerManager = playerMgr;
+        //일단 로직상 같아야함.
+        if (_playerInstanceDic.Count == maxPlayerCount) return true;
+        else return false;
     }
-    public void DeletePlayerManager(PlayerManager playerMgr)
+    public void SetPlayerManager(PlayerManager playerMgr,int actorID)
     {
-        playerManager = null;
+        //playerManager = playerMgr;
+
+        if(!_playerInstanceDic.ContainsKey(actorID))
+        {
+            _playerInstanceDic[actorID] = playerMgr;
+            Debug.Log($"{actorID}등록되었습니다");
+        }
+
+    }
+    public void DeletePlayerManager(PlayerManager playerMgr,int actorID)
+    {
+        //playerManager = null;
+        if(_playerInstanceDic.ContainsKey(actorID))
+        {
+            _playerInstanceDic.Remove(actorID);
+        }
     }
 }

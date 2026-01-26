@@ -46,4 +46,8 @@ public class CardPresenter
             Debug.Log("카드 타겟대상이 틀렸습니다 확인해주세요. 실행취소");
         }
     }
+    public CardSOClass ReturnCardData()
+    {
+        return cardModel.CardInstance.CardData;
+    }
 }

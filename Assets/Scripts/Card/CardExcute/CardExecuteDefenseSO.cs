@@ -10,7 +10,7 @@ public class CardExecuteDefenseSO : CardExecuteSO
         Debug.Log("Defense");
         //;
         //info.UseCardPlayer.AddPlayerShield()
-        info.UseCardPlayer.AddPlayerShield(amount);
+        info.UseCardPlayer.AddPlayerShield(amount,info.CardCost);
         return true;
     }
 }
