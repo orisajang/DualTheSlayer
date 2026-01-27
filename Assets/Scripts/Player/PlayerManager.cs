@@ -14,7 +14,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //플레이어의 덱
     PlayerDeck playerDeck;
     //플레이어 손패
-    List<CardSOClass> playerHand = new List<CardSOClass>();
+    List<CardInstance> playerHand = new List<CardInstance>();
 
     //시작 플레이 카드
     [SerializeField,Tooltip("플레이어 시작 카드 수")] int startCardCount = 5;
@@ -24,8 +24,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //카드 내는 제한선
     [SerializeField] RectTransform _useCardLine;
 
-    //
+    //게임화면에서 에너지를 표시하는 텍스트UI가 어디에있는지
     [SerializeField] TextMeshProUGUI _energyTextUI;
+    //최대 카드 보유가능 갯수 
+    [SerializeField] int limitMaxCard = 10;
+
 
     //플레이어의 스탯
     public int level { get; private set; }
@@ -63,7 +66,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         //플레이어 초기 손패 5개 넣음
         for (int index = 0; index < startCardCount; index++)
         {
-            SetPlayerHand();
+            DrawPlayerCard();
         }
         Debug.Log(playerHand.Count);
         //플레이어 정보 설정
@@ -109,14 +112,20 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         
         
     } 
-    public void SetPlayerHand()
+    //메서드 실행하면 카드를 1장 뽑는다
+    public void DrawPlayerCard()
     {
+        //카드를 뽑는거는 이 플레이어를 소유한 사람만 뽑아야하므로 예외처리
+        if (!photonView.IsMine) return;
+        //최대 카드 보유량을 넘어섰다면 return
+        if (playerHand.Count >= limitMaxCard) return;
+
         //카드 데이터 가져오기
         CardSOClass cardSOData = playerDeck.GetCard();
         //카드 인스턴스 생성 (현재 카드의 코스트가 감소할수있으므로 인스턴스를 만들어서 원본 데이터와 따로 관리
         CardInstance instance = new CardInstance(cardSOData);
         //손패에 추가 (List)
-        playerHand.Add(cardSOData);
+        playerHand.Add(instance);
         //테스트용. 소환해본다
         CardView cardView = CardSpawner.Instance.GetCardByPool();
         //이제 MVP에 있는곳 코드랑 연관해서 카드정보를 Set
@@ -138,8 +147,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         //에너지 UI 표시위치 설정 및 최대 에너지로 현재 에너지 설정
         _energyTextUI = text;
         currentEnergy = maxEnergy;
-        //설정후에 자신의 행동력을 텍스트에 표시하도록 (행동력 0을 감소시키도록 해서 자신의 초기행동력 표시)
-        DecreaseEnergy(0);
+        //초기 자신의 행동력을 텍스트에 표시하는 RPC
+        photonView.RPC(nameof(InitEnergyRPC), RpcTarget.AllBuffered, currentEnergy);
+        //카드를 한장 뽑는다
+        DrawPlayerCard();
     }
     //더이상 자신의 턴이 아닐때 초기화해야할 항목들 모아둠
     public void RemovePlayerTurnInit()
@@ -172,6 +183,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         _energyTextUI.text = energyText.ToString();
     }
 
+    //사용된 카드를 플레이어 손패에서 지운다
+    public void RemovePlayerHand(CardInstance usedCard)
+    {
+        //손패에서 제거
+        playerHand.Remove(usedCard);
+        Debug.Log($"플레이어의 손패갯수:{playerHand.Count}");
+    }
+
     //쉴드 생성
     public void AddPlayerShield(int amount,int CardCost)
     {
@@ -179,7 +198,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         UpdateHpBar();
         //행동력 감소
         DecreaseEnergy(CardCost);
-        //photonView.RPC(nameof(DecreaseEnergy), RpcTarget.AllBuffered, CardCost);
     }
     //공격 받음
     public void TakeDamage(int amount)
@@ -200,6 +218,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         currentEnergy -= cardCost;
         SetEnergyText(currentEnergy);
         Debug.Log($"{photonView.Owner.ActorNumber} 행동력: {currentEnergy}");
+    }
+    [PunRPC]
+    private void InitEnergyRPC(int energy)
+    {
+        SetEnergyText(energy);
     }
     //데미지 받았을때 모두에게 데미지 받은사람 알리기위해서
     [PunRPC]

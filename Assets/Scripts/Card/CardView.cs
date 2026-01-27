@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,16 +6,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardView : MonoBehaviour, ICardMVPView
+public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
 {
     [SerializeField] Image cardImage;
     [SerializeField] TextMeshProUGUI cardDescription;
+    [SerializeField] TextMeshProUGUI cardCost;
 
     //MVP관련 설정
     CardPresenter cardPresenter;
 
     //현재 카드의 데이터
-    CardSOClass cardClass;
+    public CardInstance cardInstanceData { get; private set; }
 
     public void Init(CardInstance instance)
     {
@@ -25,14 +27,15 @@ public class CardView : MonoBehaviour, ICardMVPView
         //카드 이미지, 설명을 갱신
         cardPresenter.UpdateCardUI();
         //현재 카드의 데이터 설정
-        cardClass = cardPresenter.ReturnCardData();
+        cardInstanceData = cardPresenter.ReturnCardData();
     }
 
     //Presenter에서 받아온 정보로 UI 갱신
-    public void SetCardResource(Sprite sprite, string text)
+    public void SetCardResource(Sprite sprite, string text, string cost)
     {
         cardImage.sprite = sprite;
         cardDescription.text = text;
+        cardCost.text = cost;
     }
     public eTargetType GetTargetType()
     {
@@ -47,7 +50,7 @@ public class CardView : MonoBehaviour, ICardMVPView
         //사용자, 타겟, 
         int player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
         PlayerManager myPlayer = GameManager.Instance.playerManager;
-        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, enemyPlayer,cardClass.Cost);
+        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, enemyPlayer,cardInstanceData);
         cardPresenter.ExecuteCard(this, cardTargetInfoClass);
 
         //CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer);
@@ -60,7 +63,7 @@ public class CardView : MonoBehaviour, ICardMVPView
         //사용자, 타겟, 
         int player = GameManager.Instance.turnManager.CurrentPlayerId; //사용자, 타겟
         PlayerManager myPlayer = GameManager.Instance.playerManager;
-        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer, cardClass.Cost);
+        CardTargetInfoClass cardTargetInfoClass = new CardTargetInfoClass(myPlayer, myPlayer, cardInstanceData);
         cardPresenter.ExecuteCard(this, cardTargetInfoClass);
     }
     //현재 자신의 카드가 사용가능한 상태인지 체크 (사용불가능하면 코스트Text가 빨간색으로 할 예정)
@@ -68,7 +71,7 @@ public class CardView : MonoBehaviour, ICardMVPView
     {
         //현재 행동력과 카드의 비용을 체크해서 카드를 사용할 수 있는 상태인지 체크한다.
         int playerEnergy = GameManager.Instance.turnManager.CurrentTurnPlayer.currentEnergy;
-        if(cardClass.Cost > playerEnergy)
+        if(cardInstanceData.CardData.Cost > playerEnergy)
         {
             Debug.Log($"행동력이 더작다 카드를 내면안됨 ");
             return false;
@@ -78,6 +81,13 @@ public class CardView : MonoBehaviour, ICardMVPView
             Debug.Log($"카드내도됩니다~~");
             return true;
         }
+    }
+    //카드 UI 갱신(카드 사용할때마다 어떤 카드 사용되었는지 보여주는 UI)
+    public void UpdateCardInfoUI()
+    {
+        //이제 RPC로 띄워야함, 다같이 화면에 있는 Prefab에 이미지, cost, 텍스트가 띄워진 상태로 보여야한다.
+        Debug.Log("UpdateCardInfoUI 시작");
+        GameManager.Instance.inGameNetworkMgr.ShowUsedCard(cardInstanceData.CardData.CardImage.name, cardInstanceData.CardData.Description, cardInstanceData.CardData.Cost.ToString());
     }
 }
 

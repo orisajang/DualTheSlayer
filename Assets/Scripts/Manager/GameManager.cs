@@ -12,10 +12,16 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
+    //턴 관리 매니저
     public TurnManager turnManager { get; private set; }
+    //현재 턴에서 어떤 플레이어가 진행중인지
     public PlayerManager playerManager { get; private set; }
-
+    //카드를 사용할때 화살표UI를 만들기위해서
     public TargetingManager targetingManager { get; private set; }
+    //리소스를 관리하기위한 매니저
+    public AssetManager assetManager { get; private set; }
+    //네트워크를 관리하는 매니저
+    public InGameNetworkMgr inGameNetworkMgr { get; private set; }
 
     //플레이어 ID
     string[] playerIdArray;
@@ -26,15 +32,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] GameObject _cardPrefab;
     //카드 내는 제한선
     [SerializeField] RectTransform _useCardLine;
-    protected override void Awake()
-    {
-        isDestroyOnLoad = false;
-        base.Awake();
-
-        //플레이어 갯수 구함
-        _playerInstanceDic.Clear();
-        CalcPlayerCount();
-    }
+    
 
     Dictionary<string, CardSO> cardSODic = new Dictionary<string, CardSO>();
     List<CardSOClass> deckCardList = new List<CardSOClass>();
@@ -50,18 +48,15 @@ public class GameManager : Singleton<GameManager>
     public int maxPlayerCount { get; private set; }
     Dictionary<int, PlayerManager> _playerInstanceDic = new Dictionary<int, PlayerManager>();
     public IReadOnlyDictionary<int, PlayerManager> PlayerInstanceDic => _playerInstanceDic;
-    //실제 플레이어가 몇명인지 확인 (플레이어가 모두 설정될때까지 대기하기 위해서)
-    public void CalcPlayerCount()
+
+    protected override void Awake()
     {
-        maxPlayerCount = 0;
-        foreach (Player ply in PhotonNetwork.PlayerList)
-        {
-            //플레이어라면?
-            if ((bool)ply.CustomProperties[NetworkEventManager.IsPlayer])
-            {
-                maxPlayerCount++;
-            }
-        }
+        isDestroyOnLoad = false;
+        base.Awake();
+
+        //플레이어 갯수 구함
+        _playerInstanceDic.Clear();
+        CalcPlayerCount();
     }
 
     private IEnumerator Start()
@@ -128,12 +123,22 @@ public class GameManager : Singleton<GameManager>
             Debug.Log($"{Num}");
         }
     }
-
+    //실제 플레이어가 몇명인지 확인 (플레이어가 모두 설정될때까지 대기하기 위해서)
+    public void CalcPlayerCount()
+    {
+        maxPlayerCount = 0;
+        foreach (Player ply in PhotonNetwork.PlayerList)
+        {
+            //플레이어라면?
+            if ((bool)ply.CustomProperties[NetworkEventManager.IsPlayer])
+            {
+                maxPlayerCount++;
+            }
+        }
+    }
 
 
     //초기에 PlayerStatus를 불러옴. 그런데 만약에 정보를 불러올수없다면?
-
-
     private IEnumerator LoadPlayerData()
     {
         DatabaseReference playerRef = NetworkEventManager.Instance.GetPlayerRef();
@@ -206,6 +211,8 @@ public class GameManager : Singleton<GameManager>
         }
 
     }
+
+
     //턴매니저 할당&해제
     public void SetTurnManager(TurnManager turnMgr)
     {
@@ -250,4 +257,21 @@ public class GameManager : Singleton<GameManager>
             _playerInstanceDic.Remove(actorID);
         }
     }
+    public void SetAssetManager(AssetManager assetMgr)
+    {
+        assetManager = assetMgr;
+    }
+    public void DeleteAssetManager(AssetManager assetMgr)
+    {
+        assetManager = null;
+    }
+    public void SetInGameNetworkManager(InGameNetworkMgr networkMgr)
+    {
+        inGameNetworkMgr = networkMgr;
+    }
+    public void DeleteInGameNetworkManager(InGameNetworkMgr networkMgr)
+    {
+        inGameNetworkMgr = null;
+    }
+
 }

@@ -9,7 +9,9 @@ public class CardExecuteDefenseSO : CardExecuteSO
     {
         Debug.Log("Defense");
         //info.UseCardPlayer.AddPlayerShield()
-        info.UseCardPlayer.AddPlayerShield(amount,info.CardCost);
+        info.UseCardPlayer.AddPlayerShield(amount, info.cardInstanceData.CardData.Cost);
+        //플레이어의 손패에서 제거
+        info.UseCardPlayer.RemovePlayerHand(info.cardInstanceData);
         return true;
     }
 }

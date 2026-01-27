@@ -19,7 +19,9 @@ public class CardExecuteAttackSO : CardExecuteSO
         //상대에게 데미지 처리
         cardTargetInfoClass.TargetPlayer.TakeDamage(amount);
         //자신의 행동력 감소
-        cardTargetInfoClass.UseCardPlayer.DecreaseEnergy(cardTargetInfoClass.CardCost);
+        cardTargetInfoClass.UseCardPlayer.DecreaseEnergy(cardTargetInfoClass.cardInstanceData.CardData.Cost);
+        //플레이어의 손패에서 제거
+        cardTargetInfoClass.UseCardPlayer.RemovePlayerHand(cardTargetInfoClass.cardInstanceData);
         return true;
     }
 }
