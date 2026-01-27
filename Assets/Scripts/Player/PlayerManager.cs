@@ -28,12 +28,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] TextMeshProUGUI _energyTextUI;
 
     //플레이어의 스탯
-    public int level;
-    public int exp;
-    public int maxHp;
-    public int currentHp;
-    public int shield;
-    public int energy;
+    public int level { get; private set; }
+    public int exp { get; private set; }
+    public int maxHp { get; private set; }
+    public int currentHp { get; private set; }
+    public int shield { get; private set; }
+    public int currentEnergy { get; private set; }
+    private int maxEnergy = 3; // 일단 무조건 3이라고 가정하고 사용
     //기타 상태이상들
     public int AttackBufValue;
 
@@ -131,10 +132,19 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         CardInputController cardInputController = cardView.GetComponent<CardInputController>();
         cardInputController.Init();
     }
-
-    public void SetEnergyTextUI(TextMeshProUGUI text)
+    //플레이어 턴이 시작될때 초기화해야할 속성을 모아둠
+    public void SetPlyerTurnInit(TextMeshProUGUI text)
     {
+        //에너지 UI 표시위치 설정 및 최대 에너지로 현재 에너지 설정
         _energyTextUI = text;
+        currentEnergy = maxEnergy;
+        //설정후에 자신의 행동력을 텍스트에 표시하도록 (행동력 0을 감소시키도록 해서 자신의 초기행동력 표시)
+        DecreaseEnergy(0);
+    }
+    //더이상 자신의 턴이 아닐때 초기화해야할 항목들 모아둠
+    public void RemovePlayerTurnInit()
+    {
+        _energyTextUI = null;
     }
     public void UpdateHpBar()
     {
@@ -150,12 +160,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             hpratio = currentHp / (float)maxHp;
         }
         _playerHpBar.UpdateHPBarInfo(hpratio, currentHp, shield);
-
-
-        photonView.RPC(nameof(SetEnergyText), RpcTarget.AllBuffered, energy);
-        
     }
-    [PunRPC]
     public void SetEnergyText(int energyText)
     {
         if (_energyTextUI == null)
@@ -165,7 +170,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         
         _energyTextUI.text = energyText.ToString();
-        energy--;
     }
 
     //쉴드 생성
@@ -175,6 +179,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         UpdateHpBar();
         //행동력 감소
         DecreaseEnergy(CardCost);
+        //photonView.RPC(nameof(DecreaseEnergy), RpcTarget.AllBuffered, CardCost);
     }
     //공격 받음
     public void TakeDamage(int amount)
@@ -182,12 +187,21 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         photonView.RPC(nameof(TakeDamageRPC), RpcTarget.AllBuffered, amount);
         //TakeDamageRPC(amount);
     }
-    //행동력 감소
-    public void DecreaseEnergy(int CardCost)
+    //행동력 감소 메서드 (RPC 실행용도)
+    public void DecreaseEnergy(int cardCost)
     {
-        energy -= CardCost;
+        photonView.RPC(nameof(DecreaseEnergyRPC), RpcTarget.AllBuffered, cardCost);
     }
-
+    //행동력 감소할때 모두에게 알리기위해서 RPC
+    [PunRPC]
+    private void DecreaseEnergyRPC(int cardCost)
+    {
+        Debug.Log($"감소전 행동력 {currentEnergy} 비용 {cardCost}");
+        currentEnergy -= cardCost;
+        SetEnergyText(currentEnergy);
+        Debug.Log($"{photonView.Owner.ActorNumber} 행동력: {currentEnergy}");
+    }
+    //데미지 받았을때 모두에게 데미지 받은사람 알리기위해서
     [PunRPC]
     public void TakeDamageRPC(int amount)
     {

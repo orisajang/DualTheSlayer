@@ -18,6 +18,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [SerializeField] private TextMeshProUGUI _energyText;
 
     private List<int> _plyIdArray = new List<int>();
+
+    //현재 턴인 플레이어를 담아둠
+    public PlayerManager CurrentTurnPlayer { get; private set; }
+
     private void Start()
     {
         //초기에 플레이어 프로퍼티를 확인하면서 플레이어정보를 읽음
@@ -65,10 +69,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
         {
             if (ply.ActorNumber == CurrentPlayerId)
             {
-                //현재 플레이어의 ID 설정
-                //SetPlayerID(ply.ActorNumber);
-                PlayerManager playerManager = GameManager.Instance.PlayerInstanceDic[ply.ActorNumber];
-                playerManager.SetEnergyTextUI(_energyText);
+                //이전에 턴인사람이 있었다면 이전에 설정해준 값들을 다 null로 처리해준다
+                if(CurrentTurnPlayer != null)
+                {
+                    CurrentTurnPlayer.RemovePlayerTurnInit();
+                }
+                //현재 턴인 플레이어를 위해 초기값 설정
+                CurrentTurnPlayer = GameManager.Instance.PlayerInstanceDic[ply.ActorNumber];
+                CurrentTurnPlayer.SetPlyerTurnInit(_energyText);
                 Debug.Log($"현재턴 플레이어번호:{ply.ActorNumber} 내번호: {PhotonNetwork.LocalPlayer.ActorNumber}");
                 if (ply.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                 {

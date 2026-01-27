@@ -8,7 +8,6 @@ public class CardExecuteDefenseSO : CardExecuteSO
     public override bool Execute(CardTargetInfoClass info)
     {
         Debug.Log("Defense");
-        //;
         //info.UseCardPlayer.AddPlayerShield()
         info.UseCardPlayer.AddPlayerShield(amount,info.CardCost);
         return true;

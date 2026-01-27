@@ -16,11 +16,10 @@ public class CardExecuteAttackSO : CardExecuteSO
             Debug.Log("자기 자신을 공격할수 없습니다");
             return false;
         }
-
+        //상대에게 데미지 처리
         cardTargetInfoClass.TargetPlayer.TakeDamage(amount);
-
-        //CardSpawner.Instance.ReturnCardToPool(cardView);
-        //정상 동작되었으면 true반환하고 풀에서 없애줌
+        //자신의 행동력 감소
+        cardTargetInfoClass.UseCardPlayer.DecreaseEnergy(cardTargetInfoClass.CardCost);
         return true;
     }
 }
