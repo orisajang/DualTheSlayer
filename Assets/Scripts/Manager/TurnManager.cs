@@ -129,7 +129,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public override void OnDisable()
     {
         base.OnDisable();
-        GameManager.Instance.DeleteTurnManager(this);
+        if (GameManager.isHaveInstance) GameManager.Instance.DeleteTurnManager(this);
         _endTurnButton.onClick.RemoveAllListeners();
     }
 

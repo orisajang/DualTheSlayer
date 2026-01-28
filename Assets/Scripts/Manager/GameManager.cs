@@ -23,6 +23,8 @@ public class GameManager : Singleton<GameManager>
     public AssetManager assetManager { get; private set; }
     //네트워크를 관리하는 매니저
     public InGameNetworkMgr inGameNetworkMgr { get; private set; }
+    //게임결과 패널을 관리하는 매니저
+    [SerializeField] private GameResultPanelManager gameResultPanelManager;
 
     //플레이어 ID
     string[] playerIdArray;
@@ -229,7 +231,12 @@ public class GameManager : Singleton<GameManager>
 
     }
 
+    public void ShowGameResultPanel(string gameResult, string resultInfo )
+    {
+        gameResultPanelManager.ActiveResultPanelAndSetInfo(gameResult, resultInfo);
+    }
 
+    #region GameManager에 있는 매니저들을 설정하고, 할당해제하기위한 메서드
     //턴매니저 할당&해제
     public void SetTurnManager(TurnManager turnMgr)
     {
@@ -289,5 +296,15 @@ public class GameManager : Singleton<GameManager>
     {
         inGameNetworkMgr = null;
     }
+    public void SetGameResultPanelManager(GameResultPanelManager gameResultPanelMgr)
+    {
+        gameResultPanelManager = gameResultPanelMgr;
+    }
+    public void DeleteGameResultPanelManager(GameResultPanelManager gameResultPanelMgr)
+    {
+        gameResultPanelManager = null;
+    }
+
+    #endregion
 
 }

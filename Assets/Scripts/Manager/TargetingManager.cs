@@ -14,6 +14,6 @@ public class TargetingManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        GameManager.Instance.DeleteTargetManager(this);
+        if (GameManager.isHaveInstance) GameManager.Instance.DeleteTargetManager(this);
     }
 }

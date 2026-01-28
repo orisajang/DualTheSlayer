@@ -111,7 +111,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     public override void OnDisable()
     {
         base.OnDisable();
-        GameManager.Instance.DeletePlayerManager(this, photonView.Owner.ActorNumber);
+        if (GameManager.isHaveInstance) GameManager.Instance.DeletePlayerManager(this, photonView.Owner.ActorNumber);
         if (!photonView.IsMine) return;
         
         

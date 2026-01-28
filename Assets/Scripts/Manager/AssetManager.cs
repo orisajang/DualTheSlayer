@@ -22,6 +22,6 @@ public class AssetManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        GameManager.Instance.DeleteAssetManager(this);
+        if (GameManager.isHaveInstance) GameManager.Instance.DeleteAssetManager(this);
     }
 }

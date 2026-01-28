@@ -20,7 +20,7 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
     public override void OnDisable()
     {
         base.OnDisable();
-        GameManager.Instance.DeleteInGameNetworkManager(this);
+        if (GameManager.isHaveInstance) GameManager.Instance.DeleteInGameNetworkManager(this);
     }
     [PunRPC]
     private void ShowUsedCard_RPC(string imageName, string description, string cost)
@@ -77,7 +77,6 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
             {
                 Debug.Log("마스터클라이언트에서 죽은사람에게 RPC를 보냄");
                 photonView.RPC(nameof(AddExpValue), ply, defeatPlayerAddExp);
-
             }
             else if( ply.ActorNumber == attackerActorID) //만약 공격자였다면 (승리한사람)
             {
@@ -85,6 +84,8 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
                 photonView.RPC(nameof(AddExpValue), ply, victoryPlayerAddExp);
             }
         }
+
+        photonView.RPC(nameof(ShowGameResultPanel_RPC), RpcTarget.All, deadPlayerActorNumber, attackerActorID, defeatPlayerAddExp, victoryPlayerAddExp);
     }
     //올려야되는 대상들만 RPC로 아래 이벤트 받고 DB에 결과 저장
     [PunRPC]
@@ -93,5 +94,26 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
         Debug.Log($"마스터클라이언트에서 RPC를 받았습니다 {addExpValue}");
         GameManager.Instance.SavePlayerData(addExpValue);
     }
-
+    [PunRPC]
+    public void ShowGameResultPanel_RPC(int deadPlayerActorNumber, int attackerActorID, int defeatPlayerAddExp, int victoryPlayerAddExp)
+    {
+        Debug.Log("결과패널 열기 시작");
+        //설정 안되어있으면 관전자라는 의미이므로 
+        string gameResult = "";
+        if(PhotonNetwork.LocalPlayer.ActorNumber == deadPlayerActorNumber) //패배한사람
+        {
+            gameResult = "Defeate!!";
+        }
+        else if(PhotonNetwork.LocalPlayer.ActorNumber == attackerActorID) //승리한사람
+        {
+            gameResult = "Victory!!";
+        }
+        else //관전자라는 의미
+        {
+            gameResult = "GameResult";
+        }
+        string resultInfo = $"{deadPlayerActorNumber} 패배. {defeatPlayerAddExp}의 경험치 획득 \n" +
+            $"{attackerActorID} 승리. {victoryPlayerAddExp}의 경험치 획득";
+        GameManager.Instance.ShowGameResultPanel(gameResult, resultInfo);
+    }
 }
