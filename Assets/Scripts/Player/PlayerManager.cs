@@ -42,6 +42,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //기타 상태이상들
     public int AttackBufValue;
 
+    //도트힐 스택
+    public int dotHealAmount; //힐량
+    public int dotHealDuration; //힐 지속턴
+
+
     //플레이어의 HP바
     [SerializeField] PlayerHpBar _playerHpBar;
 
@@ -66,7 +71,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         _useCardLine = config.useCardLine;
         //덱 설정
         playerDeck = GetComponent<PlayerDeck>();
-        playerDeck.SetCard(config.deck);
+        playerDeck.SetCard(config.originDeck);
         //플레이어 초기 손패 5개 넣음
         for (int index = 0; index < startCardCount; index++)
         {
@@ -124,17 +129,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         //최대 카드 보유량을 넘어섰다면 return
         if (playerHand.Count >= limitMaxCard) return;
 
-        //카드 데이터 가져오기
-        CardSOClass cardSOData = playerDeck.GetCard();
+        //카드 데이터 가져오기 (현재 카드 코스트 감소할수있으므로 원본데이터와 따로 분리해서 인스턴스라는것을 만들어서 가져왔음)
+        CardInstance instance = playerDeck.GetCard();
         //카드 인스턴스 생성 (현재 카드의 코스트가 감소할수있으므로 인스턴스를 만들어서 원본 데이터와 따로 관리
-        CardInstance instance = new CardInstance(cardSOData);
+        //CardInstance instance = new CardInstance(cardInstanceData);
         //손패에 추가 (List)
         playerHand.Add(instance);
-        //테스트용. 소환해본다
+        //풀에서 카드를 1개 활성화해주고 카드 정보설정 
         CardView cardView = CardSpawner.Instance.GetCardByPool();
-        //이제 MVP에 있는곳 코드랑 연관해서 카드정보를 Set
-        //초기화 (View를 초기화하면 안의 presenter과 Model도 생성및 초기화해줌)
-        //추후에 초기화하는 스크립트(Card안에 스크립트를 직렬화하고, 모아주는 스크립트 필요할듯?)
         cardView.Init(instance);
         //카드 Hover할때도 넣어주자
         CardHover cardHover = cardView.GetComponent<CardHover>();
@@ -152,9 +154,22 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         _energyTextUI = text;
         currentEnergy = maxEnergy;
         //초기 자신의 행동력을 텍스트에 표시하는 RPC
-        photonView.RPC(nameof(InitEnergyRPC), RpcTarget.AllBuffered, currentEnergy);
+        photonView.RPC(nameof(InitEnergyRPC), RpcTarget.All, currentEnergy);
         //카드를 한장 뽑는다
         DrawPlayerCard();
+
+        //만약에 플레이어에게 도트힐 상태가 있었다면 힐을 해준다.
+        CheckPlayerHealing();
+
+
+    }
+    //도트힐을 통해 턴시작 시 힐을 적용해야하는지 체크
+    public void CheckPlayerHealing()
+    {
+        if(dotHealDuration > 0)
+        {
+            HealingPlayerSelf(dotHealAmount);
+        }
     }
     //더이상 자신의 턴이 아닐때 초기화해야할 항목들 모아둠
     public void RemovePlayerTurnInit()
@@ -196,23 +211,57 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     //쉴드 생성
-    public void AddPlayerShield(int amount,int CardCost)
+    public void AddPlayerShield(int amount,int cardCost)
     {
         shield += amount;
         UpdateHpBar();
         //행동력 감소
-        DecreaseEnergy(CardCost);
+        DecreaseEnergy(cardCost);
+    }
+    public void AddDotHealStatus(int amount, int duration,int cardCost)
+    {
+        if(photonView.IsMine)
+        {
+            photonView.RPC(nameof(AddDotHealStatusRPC), RpcTarget.All, amount, duration);
+        }
+        //행동력 감소
+        DecreaseEnergy(cardCost);
+    }
+    [PunRPC]
+    private void AddDotHealStatusRPC(int amount, int duration)
+    {
+        dotHealAmount = amount;
+        dotHealDuration = duration;
     }
     //공격 받음
     public void TakeDamage(int amount,int attackerActorID)
     {
-        photonView.RPC(nameof(TakeDamageRPC), RpcTarget.AllBuffered, amount, attackerActorID);
+        photonView.RPC(nameof(TakeDamageRPC), RpcTarget.All, amount, attackerActorID);
         //TakeDamageRPC(amount);
     }
+    //플레이어 회복
+    public void HealingPlayerSelf(int amount)
+    {
+        //자기자신턴인 플레이어가 직접 RPC로 값들을 보내준다
+        if(photonView.IsMine)
+        {
+            Debug.Log($"{photonView.Owner.ActorNumber}가 {amount}만큼 힐을 합니다");
+            photonView.RPC(nameof(HealingPlayerSelfRPC), RpcTarget.All, amount);
+        }
+    }
+
     //행동력 감소 메서드 (RPC 실행용도)
     public void DecreaseEnergy(int cardCost)
     {
-        photonView.RPC(nameof(DecreaseEnergyRPC), RpcTarget.AllBuffered, cardCost);
+        photonView.RPC(nameof(DecreaseEnergyRPC), RpcTarget.All, cardCost);
+    }
+    //자기자신 회복용도 RPC
+    [PunRPC]
+    public void HealingPlayerSelfRPC(int amount)
+    {
+        currentHp += amount;
+        if (currentHp > maxHp) currentHp = maxHp;
+        UpdateHpBar();
     }
     //행동력 감소할때 모두에게 알리기위해서 RPC
     [PunRPC]

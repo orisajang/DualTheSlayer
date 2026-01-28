@@ -10,7 +10,7 @@ public enum eTargetType
 {
     Target, NotTarget
 }
-
+//(SO를 만든뒤 Resource/CardData폴더에 넣어둬야함)
 [CreateAssetMenu(menuName = "Card/Card Data", fileName = "CardData")]
 public class CardSO : ScriptableObject
 {
@@ -23,7 +23,7 @@ public class CardSO : ScriptableObject
     [SerializeField] private string description; //카드 설명
     [SerializeField] private eTargetType targetAble; //타게팅 가능한 스킬인지
     //실행되면 무엇을 해야하는지
-    [SerializeField] CardExecuteSO executeSO;
+    [SerializeField] List<CardExecuteSO> executeSO;
 
 
     //읽기전용 프로퍼티들
@@ -34,17 +34,5 @@ public class CardSO : ScriptableObject
     public Sprite CardImage => cardImage;
     public string Description => description;
     public eTargetType TargetAble => targetAble;
-    public CardExecuteSO ExecuteSO => executeSO;
-    public void DeepCopy(CardSO cardSo)
-    {
-        CardSO copy = new CardSO();
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-        copy.cardId = cardSo.cardId;
-    }
+    public List<CardExecuteSO> ExecuteSO => executeSO;
 }

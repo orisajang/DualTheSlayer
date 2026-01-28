@@ -71,7 +71,7 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
     {
         //현재 행동력과 카드의 비용을 체크해서 카드를 사용할 수 있는 상태인지 체크한다.
         int playerEnergy = GameManager.Instance.turnManager.CurrentTurnPlayer.currentEnergy;
-        if(cardInstanceData.CardData.Cost > playerEnergy)
+        if(cardInstanceData.Cost > playerEnergy)
         {
             Debug.Log($"행동력이 더작다 카드를 내면안됨 ");
             return false;
@@ -87,7 +87,7 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
     {
         //이제 RPC로 띄워야함, 다같이 화면에 있는 Prefab에 이미지, cost, 텍스트가 띄워진 상태로 보여야한다.
         Debug.Log("UpdateCardInfoUI 시작");
-        GameManager.Instance.inGameNetworkMgr.ShowUsedCard(cardInstanceData.CardData.CardImage.name, cardInstanceData.CardData.Description, cardInstanceData.CardData.Cost.ToString());
+        GameManager.Instance.inGameNetworkMgr.ShowUsedCard(cardInstanceData.CardImage.name, cardInstanceData.Description, cardInstanceData.Cost.ToString());
     }
 }
 

@@ -42,7 +42,7 @@ public class GameManager : Singleton<GameManager>
     //카드ID가 string으로 주어졌을때, 어떤 카드가 매칭되어야하는지 캐싱한 딕셔너리
     Dictionary<string, CardSO> cardSODic = new Dictionary<string, CardSO>();
     //Firebase DB에서 불러온 자신의 원본덱 목록들
-    List<CardSOClass> deckCardList = new List<CardSOClass>();
+    List<CardSO> deckCardList = new List<CardSO>();
 
     //플레이어 레벨 정보
     PlayerLevelData playerLevelData;
@@ -114,7 +114,7 @@ public class GameManager : Singleton<GameManager>
                 cardPrefab = _cardPrefab,
                 useCardLine = _useCardLine,
                 id = ply.ActorNumber,
-                deck = deckCardList,
+                originDeck = deckCardList,
                 levelData = playerLevelData
             };
 
@@ -223,7 +223,7 @@ public class GameManager : Singleton<GameManager>
             foreach (DataSnapshot item in DBTask.Result.Children) //Child는 하나, Children은 여러개
             {
                 CardSO currentCard = cardSODic[item.Value.ToString()];
-                deckCardList.Add(new CardSOClass(currentCard));
+                deckCardList.Add(currentCard);
                 //만약 부하를 여러 프레임에 분산시키려면 yield로 할수도있지만, 작업도중 Save가 되면 이상해질수있음. DB는 무결성이 중요하기때문에 안하는게 좋음
             }
             Debug.Log("DB에서 덱 데이터 Load 완료");

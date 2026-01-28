@@ -86,9 +86,12 @@ public class CardHover : MonoBehaviour
         else //카드를 낸게 아니라면
         {
             //손패로 돌려놓기
-            transform.SetParent(originalParent);
-            rect.anchoredPosition = originalPos;
+            //transform.SetParent(originalParent);
+            //rect.anchoredPosition = originalPos;
         }
+        //이제 카드를 오브젝트풀로 관리하기때문에 냈던 안냈던간에 원래 부모로 돌려놔야함.
+        transform.SetParent(originalParent);
+        rect.anchoredPosition = originalPos;
 
     }
 }

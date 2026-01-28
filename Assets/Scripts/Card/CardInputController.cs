@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+//한곳에서 입력을 판단하고, 어떤 동작을 하는지 판단하는 클래스
 public class CardInputController : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler,
     IPointerDownHandler, IPointerUpHandler,
     IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    //한곳에서 입력을 판단하고, 어떤 동작을 하는지 판단하는 곳
+    //입력(CardHover와 타겟지정 화살표에 대한 동작 판단)
     [SerializeField] CardHover cardHover;
     [SerializeField] CardArrorwUI cardArrorwUI;
 

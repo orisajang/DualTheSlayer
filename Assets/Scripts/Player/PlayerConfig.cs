@@ -9,7 +9,7 @@ public class PlayerConfig
     public GameObject cardPrefab;
     public RectTransform useCardLine;
     public int id;
-    public List<CardSOClass> deck;
+    public List<CardSO> originDeck; //원본데이터라서 안의값 수정하면안됨
     public PlayerLevelData levelData;
 
 }
