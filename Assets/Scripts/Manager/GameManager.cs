@@ -3,6 +3,7 @@ using Firebase.Database;
 using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,27 +26,29 @@ public class GameManager : Singleton<GameManager>
 
     //플레이어 ID
     string[] playerIdArray;
+    //플레이어가 소환될위치 (플레이어1, 플레이어2)
     [SerializeField] GameObject playerSpawnPosParent;
     Transform[] spawnPositions;
+    //네트워크 객체로 소환될 플레이어 프리팹
     [SerializeField] GameObject playerPrefab;
+    //자신의 카드들 소환될위치와 카드 프리팹
     [SerializeField] RectTransform _cardSpawnPosition;
     [SerializeField] GameObject _cardPrefab;
     //카드 내는 제한선
     [SerializeField] RectTransform _useCardLine;
     
-
+    //카드ID가 string으로 주어졌을때, 어떤 카드가 매칭되어야하는지 캐싱한 딕셔너리
     Dictionary<string, CardSO> cardSODic = new Dictionary<string, CardSO>();
+    //Firebase DB에서 불러온 자신의 원본덱 목록들
     List<CardSOClass> deckCardList = new List<CardSOClass>();
 
     //플레이어 레벨 정보
     PlayerLevelData playerLevelData;
 
-    //
-    private Dictionary<int, PlayerManager> _playerManagers = new Dictionary<int, PlayerManager>();
-    public IReadOnlyDictionary<int, PlayerManager> PlayerManagers => _playerManagers;
     [SerializeField] public TextMeshProUGUI _energyText;
     //현재 방의 플레이어 인원 (관전자 제외)
     public int maxPlayerCount { get; private set; }
+    //플레이어별 어떤 네트워크 객체를 사용하고있는지 (클래스안에 UI객체 넣을때 필요해졌어서 정의했음)
     Dictionary<int, PlayerManager> _playerInstanceDic = new Dictionary<int, PlayerManager>();
     public IReadOnlyDictionary<int, PlayerManager> PlayerInstanceDic => _playerInstanceDic;
 
@@ -112,12 +115,11 @@ public class GameManager : Singleton<GameManager>
                 deck = deckCardList,
                 levelData = playerLevelData
             };
-            _playerManagers.Add(ply.ActorNumber, playerManager);
 
             //개인만 가지고있어야하는 설정을 Init로 만들음
             playerManager.Init(config);
             //모두가 네트워크에 보여야하는것들 설정을 위해 RPC로 보냄
-            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.AllBuffered, playerLevelData.level,playerLevelData.exp);
+            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.AllBuffered, playerLevelData.Level,playerLevelData.Exp);
 
             int Num = GameManager.Instance.playerManager.PlayerID;
             Debug.Log($"{Num}");
@@ -168,19 +170,34 @@ public class GameManager : Singleton<GameManager>
         {
             DataSnapshot snapshot = DBTask.Result;
             string json = snapshot.GetRawJsonValue();
+            Debug.Log($"Load json 데이터: {json}");
             playerLevelData = JsonUtility.FromJson<PlayerLevelData>(json);
             Debug.Log("플레이어 데이터 저장완료");
         }
     }
 
+    //플레이어 데이터 저장. 불러오기는 코루틴써봤고, 저장은 async 써봤음. async는 한프레임내에서 끝나면 바로 시작한다고함.
+    public async Task SavePlayerData(int expAddValue)
+    {
+        Debug.Log($"플레이어 경험치를 증가시키겠습니다 {expAddValue}");
+        //플레이어 경험치량을 통해 레벨업 계산
+        playerLevelData.AddExpAndCheckLevelUp(expAddValue);
+        Debug.Log($"저장전{FirebaseAuth.DefaultInstance.CurrentUser}의 플레이어 레벨: {playerLevelData.Level} 경험처: {playerLevelData.Exp} 저장됨 ");
+        //DB에 결과값 저장
+        string json = JsonUtility.ToJson(playerLevelData);
+        DatabaseReference playerDataRef = NetworkEventManager.Instance.GetPlayerRef();
 
-
-
-
-
-
-
-
+        try
+        {
+            await playerDataRef.SetRawJsonValueAsync(json);
+            Debug.Log($"저장후{FirebaseAuth.DefaultInstance.CurrentUser}의 플레이어 레벨: {playerLevelData.Level} 경험처: {playerLevelData.Exp} 저장됨 ");
+        }
+        catch(Exception ex)
+        {
+            Debug.Log($"저장에 예외발생 {ex}");
+        }
+ 
+    }
 
     private IEnumerator LoadDeckData()
     {
@@ -240,14 +257,13 @@ public class GameManager : Singleton<GameManager>
     }
     public void SetPlayerManager(PlayerManager playerMgr,int actorID)
     {
-        //playerManager = playerMgr;
-
         if(!_playerInstanceDic.ContainsKey(actorID))
         {
             _playerInstanceDic[actorID] = playerMgr;
             Debug.Log($"{actorID}등록되었습니다");
         }
-
+        //플레이어가 사망했을때 이벤트가 등록되어야 하므로 추가
+        playerMgr.OnPlayerDead += inGameNetworkMgr.PlayerDeadNotified;
     }
     public void DeletePlayerManager(PlayerManager playerMgr,int actorID)
     {

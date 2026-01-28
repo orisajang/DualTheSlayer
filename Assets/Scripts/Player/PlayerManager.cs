@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -44,6 +45,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //플레이어의 HP바
     [SerializeField] PlayerHpBar _playerHpBar;
 
+    //플레이어가 죽었을때 처리하기 위해서 이벤트 추가
+    public event Action<int, int> OnPlayerDead;
+
     public int CalcMaxHP(int level)
     {
         return level * 10;
@@ -74,9 +78,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     }
     public void InitPlayerStat(PlayerLevelData levelData)
     {
-        level = levelData.level;
-        exp = levelData.exp;
-        maxHp = CalcMaxHP(levelData.level);
+        level = levelData.Level;
+        exp = levelData.Exp;
+        maxHp = CalcMaxHP(levelData.Level);
         currentHp = maxHp;
         shield = 0;
 
@@ -200,9 +204,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         DecreaseEnergy(CardCost);
     }
     //공격 받음
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount,int attackerActorID)
     {
-        photonView.RPC(nameof(TakeDamageRPC), RpcTarget.AllBuffered, amount);
+        photonView.RPC(nameof(TakeDamageRPC), RpcTarget.AllBuffered, amount, attackerActorID);
         //TakeDamageRPC(amount);
     }
     //행동력 감소 메서드 (RPC 실행용도)
@@ -226,10 +230,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     }
     //데미지 받았을때 모두에게 데미지 받은사람 알리기위해서
     [PunRPC]
-    public void TakeDamageRPC(int amount)
+    public void TakeDamageRPC(int amount, int attackerActorID)
     {
         CalcDamage(amount);
         UpdateHpBar();
+        //HP 0이되었는지확인
+        CheckHpZero(attackerActorID);
     }
     private void CalcDamage(int damage)
     {
@@ -243,6 +249,19 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             damage -= shield;
             shield = 0;
             currentHp -= damage;
+        }
+    }
+    //HP가 0이하가 되었다면 사망처리
+    private void CheckHpZero(int attackerActorID)
+    {
+        if(currentHp <= 0)
+        {
+            if(photonView.IsMine)
+            {
+                OnPlayerDead?.Invoke(photonView.Owner.ActorNumber, attackerActorID);
+            }
+            //GameManager.Instance.inGameNetworkMgr.PlayerDead(photonView.Owner.ActorNumber);
+
         }
     }
 

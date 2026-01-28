@@ -17,7 +17,7 @@ public class CardExecuteAttackSO : CardExecuteSO
             return false;
         }
         //상대에게 데미지 처리
-        cardTargetInfoClass.TargetPlayer.TakeDamage(amount);
+        cardTargetInfoClass.TargetPlayer.TakeDamage(amount, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
         //자신의 행동력 감소
         cardTargetInfoClass.UseCardPlayer.DecreaseEnergy(cardTargetInfoClass.cardInstanceData.CardData.Cost);
         //플레이어의 손패에서 제거
