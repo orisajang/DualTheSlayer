@@ -40,18 +40,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     public int currentEnergy { get; private set; }
     private int maxEnergy = 3; // 일단 무조건 3이라고 가정하고 사용
     //기타 상태이상들
-    public int AttackBufValue;
-
     //도트힐 스택 (턴이 시작될때마다 힐을 함)
-    public int dotHealAmount; //힐량
-    public int dotHealDuration; //힐 지속턴
+    public int dotHealAmount { get; private set; } //힐량
+    public int dotHealDuration { get; private set; } //힐 지속턴
 
     //출혈 스택 (카드를 낼때마다 데미지를 받음)
     private const int INVALID_BLEED_APPLIER_ID = -1; //출혈을 보유한 사람이 없는지 체크하기위해
-    public int bleedingAmount; //출혈 횟수
-    public int bleedingDuration; //출혈 지속턴
-    public int bleedApplierId = INVALID_BLEED_APPLIER_ID;  //출혈을 부여한사람 ID (데미지처리를 위해서)
-    
+    public int bleedingAmount { get; private set; } //출혈 횟수
+    public int bleedingDuration { get; private set; } //출혈 지속턴
+    public int BleedApplierId { get; private set; } = INVALID_BLEED_APPLIER_ID;  //출혈을 부여한사람 ID (데미지처리를 위해서)
 
 
     //플레이어의 HP바
@@ -59,6 +56,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
 
     //플레이어가 죽었을때 처리하기 위해서 이벤트 추가
     public event Action<int, int> OnPlayerDead;
+
+    //플레이어의 버프UI생성위치
+    //[SerializeField] PlayerBuffUI _playerBuffUI; //이거 못함. 버프가 적용될때 이 스크립트를 생성해야하는것이기 떄문에
+    [SerializeField] PlayerBuffSpawner _playerBuffSpawner;  //플레이어버프UI를 오브젝트풀로 생성해주는 스크립트
+    //[SerializeField] Transform _buffUIMakePosition;
+    //[SerializeField] GameObject _buffUIPrefab;
+    Dictionary<eBuffType, PlayerBuffUI> _playerBuffTypeDic = new Dictionary<eBuffType, PlayerBuffUI>(); //버프 생성 및 저장해놓은 딕셔너리
+
 
     public int CalcMaxHP(int level)
     {
@@ -240,7 +245,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         if (bleedingDuration > 0)
         {
             //예외처리: 만약 출혈 부여자의 ID가 없는경우라면 이상함. 에러발생
-            if(bleedApplierId == INVALID_BLEED_APPLIER_ID)
+            if(BleedApplierId == INVALID_BLEED_APPLIER_ID)
             {
                 Debug.LogError("출혈 보유자의 ID가 없습니다. 에러발생");
                 return;
@@ -248,9 +253,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             bleedingDuration -= 1;
             Debug.Log($"출혈 발동!! 데미지: {bleedingAmount} 남은출혈횟수: {bleedingDuration}");
             //자기자신만 TakeDamage를 보내줌(1번만 보내야하므로)
+            
             if (photonView.IsMine)
             {
-                TakeDamage(bleedingAmount, bleedApplierId);
+                //bool isBuffEnd = _playerBuffTypeDic[eBuffType.Bleeding].ActivateBuffOnce();
+                photonView.RPC(nameof(ActivateBuffOnceRPC), RpcTarget.All, eBuffType.Bleeding);
+                TakeDamage(bleedingAmount, BleedApplierId);
             }
         }
         
@@ -258,9 +266,22 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         if(bleedingDuration <= 0)
         {
             bleedingAmount = 0;
-            bleedApplierId = INVALID_BLEED_APPLIER_ID;
+            BleedApplierId = INVALID_BLEED_APPLIER_ID;
+        }
+    }
+    [PunRPC]
+    public void ActivateBuffOnceRPC(eBuffType type)
+    {
+        //RPC로 버프 횟수를 1회 사용했다는거를 알린다
+        bool isBuffEnd = false;
+        switch(type)
+        {
+            case eBuffType.Bleeding:
+                isBuffEnd = _playerBuffTypeDic[type].ActivateBuffOnce();
+                break;
         }
 
+        if (isBuffEnd) _playerBuffTypeDic.Remove(type);
     }
 
     //쉴드 생성
@@ -286,8 +307,36 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log($"RPC시작전 부여자: {applierActorNumber}, 피격자: {photonView.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
         bleedingAmount = amount;
         bleedingDuration = duration;
-        bleedApplierId = applierActorNumber;
+        BleedApplierId = applierActorNumber;
+
+        //UI생성
+        eBuffType bleedType = eBuffType.Bleeding;
+        //이미 출혈이 존재한다면
+        CreateOrAddBuffStatus(bleedType, amount, duration);
     }
+    //버프가 없다면 만들어주고, 아니면 횟수를 추가해준다
+    public void CreateOrAddBuffStatus(eBuffType buffType, int amount, int duration)
+    {
+        switch(buffType)
+        {
+            case eBuffType.Bleeding:
+                if(!_playerBuffTypeDic.ContainsKey(buffType))
+                {
+                    //새로 만들어줌
+                    //PlayerBuffUI playerBuffUI = Instantiate(_buffUIPrefab, _buffUIMakePosition).GetComponent<PlayerBuffUI>();
+                    PlayerBuffUI playerBuffUI = _playerBuffSpawner.GetPlayerBuffUIByPool();
+                    playerBuffUI.SetBuffInfo(amount, duration, buffType);
+                    _playerBuffTypeDic.Add(buffType, playerBuffUI);
+                }
+                else
+                {
+                    //버프횟수 추가
+                    _playerBuffTypeDic[buffType].AddBuffInfo(amount, duration, buffType);
+                }
+                break;
+        }
+    }
+
     public void AddDotHealStatus(int amount, int duration,int cardCost)
     {
         if(photonView.IsMine)
