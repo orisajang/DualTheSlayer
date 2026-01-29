@@ -42,9 +42,16 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //기타 상태이상들
     public int AttackBufValue;
 
-    //도트힐 스택
+    //도트힐 스택 (턴이 시작될때마다 힐을 함)
     public int dotHealAmount; //힐량
     public int dotHealDuration; //힐 지속턴
+
+    //출혈 스택 (카드를 낼때마다 데미지를 받음)
+    private const int INVALID_BLEED_APPLIER_ID = -1; //출혈을 보유한 사람이 없는지 체크하기위해
+    public int bleedingAmount; //출혈 횟수
+    public int bleedingDuration; //출혈 지속턴
+    public int bleedApplierId = INVALID_BLEED_APPLIER_ID;  //출혈을 부여한사람 ID (데미지처리를 위해서)
+    
 
 
     //플레이어의 HP바
@@ -209,6 +216,52 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         playerHand.Remove(usedCard);
         Debug.Log($"플레이어의 손패갯수:{playerHand.Count}");
     }
+    //카드를 낸 다음에 발동되어야 할 것들 모아둠.
+    public void AfterUseCardBehavior(int cardCost)
+    {
+        //행동을 전부 실행한다음 행동력이 감소해야함
+        DecreaseEnergy(cardCost);
+
+        //카드 1회 내면 출혈효과 발동해야함. 추후  이펙트도 여기서 가능할듯 
+        CheckBleedingStatus();
+    }
+    public void CheckBleedingStatus()
+    {
+        //내 네트워크 객체이고, 출혈횟수가 0보다 클때만 발동
+        if(photonView.IsMine && bleedingDuration > 0)
+        {
+            photonView.RPC(nameof(CheckBleedingStatusRPC), RpcTarget.All);
+        }
+    }
+    [PunRPC]
+    public void CheckBleedingStatusRPC()
+    {
+        Debug.Log($"실행자 ID: {photonView.Owner.ActorNumber} 출혈량 {bleedingAmount}, 횟수 {bleedingDuration}");
+        if (bleedingDuration > 0)
+        {
+            //예외처리: 만약 출혈 부여자의 ID가 없는경우라면 이상함. 에러발생
+            if(bleedApplierId == INVALID_BLEED_APPLIER_ID)
+            {
+                Debug.LogError("출혈 보유자의 ID가 없습니다. 에러발생");
+                return;
+            }
+            bleedingDuration -= 1;
+            Debug.Log($"출혈 발동!! 데미지: {bleedingAmount} 남은출혈횟수: {bleedingDuration}");
+            //자기자신만 TakeDamage를 보내줌(1번만 보내야하므로)
+            if (photonView.IsMine)
+            {
+                TakeDamage(bleedingAmount, bleedApplierId);
+            }
+        }
+        
+        //출혈 해제되었을경우 ID값 다시 초기화
+        if(bleedingDuration <= 0)
+        {
+            bleedingAmount = 0;
+            bleedApplierId = INVALID_BLEED_APPLIER_ID;
+        }
+
+    }
 
     //쉴드 생성
     public void AddPlayerShield(int amount,int cardCost)
@@ -216,7 +269,24 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         shield += amount;
         UpdateHpBar();
         //행동력 감소
-        DecreaseEnergy(cardCost);
+        //DecreaseEnergy(cardCost);
+    }
+    //출혈 상태 부여 (효과는 카드 낼때마다 발동됨 -> CheckUseCardAfterEffect에서 실제 발동)
+    public void AddBleedingStatus(int amount, int duration,int cardCost, int applierActorNumber)
+    {
+        //여기서는 RPC로 출혈받는사람이 자기자신의 출혈수치만 증가시킴
+        Debug.Log($"시작전 부여자: {applierActorNumber}, 피격자: {photonView.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
+        //이 메서드는 다른사람이 생성한 네트워크 객체에 접근해서 RPC를 쏴주는거라 IsMine이 무조건 false임. IsMine체크하지말것
+        photonView.RPC(nameof(AddBleedingStatusRPC), RpcTarget.All, amount, duration, cardCost, applierActorNumber);
+        Debug.Log($"출혈 photonView.IsMine 들어왔다");
+    }
+    [PunRPC]
+    private void AddBleedingStatusRPC(int amount, int duration, int cardCost, int applierActorNumber)
+    {
+        Debug.Log($"RPC시작전 부여자: {applierActorNumber}, 피격자: {photonView.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
+        bleedingAmount = amount;
+        bleedingDuration = duration;
+        bleedApplierId = applierActorNumber;
     }
     public void AddDotHealStatus(int amount, int duration,int cardCost)
     {
@@ -225,7 +295,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             photonView.RPC(nameof(AddDotHealStatusRPC), RpcTarget.All, amount, duration);
         }
         //행동력 감소
-        DecreaseEnergy(cardCost);
+        //DecreaseEnergy(cardCost);
     }
     [PunRPC]
     private void AddDotHealStatusRPC(int amount, int duration)
@@ -253,7 +323,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //행동력 감소 메서드 (RPC 실행용도)
     public void DecreaseEnergy(int cardCost)
     {
-        photonView.RPC(nameof(DecreaseEnergyRPC), RpcTarget.All, cardCost);
+        if(photonView.IsMine)
+        {
+            photonView.RPC(nameof(DecreaseEnergyRPC), RpcTarget.All, cardCost);
+        }
     }
     //자기자신 회복용도 RPC
     [PunRPC]
@@ -262,6 +335,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         currentHp += amount;
         if (currentHp > maxHp) currentHp = maxHp;
         UpdateHpBar();
+
+        dotHealDuration -= 1;
+        //지속시간 다 끝나면 초기화
+        if(dotHealDuration <= 0)
+        {
+            dotHealAmount = 0;
+        }
+
     }
     //행동력 감소할때 모두에게 알리기위해서 RPC
     [PunRPC]
@@ -281,6 +362,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void TakeDamageRPC(int amount, int attackerActorID)
     {
+        Debug.Log("TakeDamageRPC");
         CalcDamage(amount);
         UpdateHpBar();
         //HP 0이되었는지확인

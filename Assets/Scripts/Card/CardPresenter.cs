@@ -36,14 +36,12 @@ public class CardPresenter
         //타겟팅 카드의 경우 대상이 아니면 false보내고 카드실행 취소해야해서 bool판별해야함
         if(isSuccess)
         {
+            //카드를 다 썼으면 그때 이제
+
             //RPC로 전체 사용자들한테 어떤 카드 썻는지 보여주는 표시
             view.UpdateCardInfoUI();
             //카드덱 오브젝트풀에 객체 반환
             CardSpawner.Instance.ReturnCardToPool(view);
-        }
-        else
-        {
-            Debug.Log("카드 타겟대상이 틀렸습니다 확인해주세요. 실행취소");
         }
     }
     public CardInstance ReturnCardData()
