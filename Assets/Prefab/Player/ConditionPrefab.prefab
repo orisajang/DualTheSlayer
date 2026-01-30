@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 5714942902059481689}
   - component: {fileID: 1284572383720774045}
   m_Layer: 7
-  m_Name: BuffPrefab
+  m_Name: ConditionPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

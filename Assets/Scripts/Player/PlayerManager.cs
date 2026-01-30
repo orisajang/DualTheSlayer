@@ -59,10 +59,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
 
     //플레이어의 버프UI생성위치
     //[SerializeField] PlayerBuffUI _playerBuffUI; //이거 못함. 버프가 적용될때 이 스크립트를 생성해야하는것이기 떄문에
-    [SerializeField] PlayerBuffSpawner _playerBuffSpawner;  //플레이어버프UI를 오브젝트풀로 생성해주는 스크립트
+    [SerializeField] PlayerConditionSpawner _playerConditionSpawner;  //플레이어버프UI를 오브젝트풀로 생성해주는 스크립트
     //[SerializeField] Transform _buffUIMakePosition;
     //[SerializeField] GameObject _buffUIPrefab;
-    Dictionary<eBuffType, PlayerBuffUI> _playerBuffTypeDic = new Dictionary<eBuffType, PlayerBuffUI>(); //버프 생성 및 저장해놓은 딕셔너리
+    Dictionary<eConditionType, PlayerConditionUI> _playerConditionTypeDic = new Dictionary<eConditionType, PlayerConditionUI>(); //버프 생성 및 저장해놓은 딕셔너리
 
 
     public int CalcMaxHP(int level)
@@ -257,7 +257,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             if (photonView.IsMine)
             {
                 //bool isBuffEnd = _playerBuffTypeDic[eBuffType.Bleeding].ActivateBuffOnce();
-                photonView.RPC(nameof(ActivateBuffOnceRPC), RpcTarget.All, eBuffType.Bleeding);
+                photonView.RPC(nameof(ActivateBuffOnceRPC), RpcTarget.All, eConditionType.Bleeding);
                 TakeDamage(bleedingAmount, BleedApplierId);
             }
         }
@@ -270,18 +270,18 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
     [PunRPC]
-    public void ActivateBuffOnceRPC(eBuffType type)
+    public void ActivateBuffOnceRPC(eConditionType type)
     {
         //RPC로 버프 횟수를 1회 사용했다는거를 알린다
         bool isBuffEnd = false;
         switch(type)
         {
-            case eBuffType.Bleeding:
-                isBuffEnd = _playerBuffTypeDic[type].ActivateBuffOnce();
+            case eConditionType.Bleeding:
+                isBuffEnd = _playerConditionTypeDic[type].ActivateConditionOnce();
                 break;
         }
 
-        if (isBuffEnd) _playerBuffTypeDic.Remove(type);
+        if (isBuffEnd) _playerConditionTypeDic.Remove(type);
     }
 
     //쉴드 생성
@@ -310,28 +310,28 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         BleedApplierId = applierActorNumber;
 
         //UI생성
-        eBuffType bleedType = eBuffType.Bleeding;
+        eConditionType bleedType = eConditionType.Bleeding;
         //이미 출혈이 존재한다면
         CreateOrAddBuffStatus(bleedType, amount, duration);
     }
     //버프가 없다면 만들어주고, 아니면 횟수를 추가해준다
-    public void CreateOrAddBuffStatus(eBuffType buffType, int amount, int duration)
+    public void CreateOrAddBuffStatus(eConditionType buffType, int amount, int duration)
     {
         switch(buffType)
         {
-            case eBuffType.Bleeding:
-                if(!_playerBuffTypeDic.ContainsKey(buffType))
+            case eConditionType.Bleeding:
+                if(!_playerConditionTypeDic.ContainsKey(buffType))
                 {
                     //새로 만들어줌
                     //PlayerBuffUI playerBuffUI = Instantiate(_buffUIPrefab, _buffUIMakePosition).GetComponent<PlayerBuffUI>();
-                    PlayerBuffUI playerBuffUI = _playerBuffSpawner.GetPlayerBuffUIByPool();
-                    playerBuffUI.SetBuffInfo(amount, duration, buffType);
-                    _playerBuffTypeDic.Add(buffType, playerBuffUI);
+                    PlayerConditionUI playerConditionUI = _playerConditionSpawner.GetPlayerBuffUIByPool();
+                    playerConditionUI.SetConditionInfo(amount, duration, buffType);
+                    _playerConditionTypeDic.Add(buffType, playerConditionUI);
                 }
                 else
                 {
                     //버프횟수 추가
-                    _playerBuffTypeDic[buffType].AddBuffInfo(amount, duration, buffType);
+                    _playerConditionTypeDic[buffType].AddConditionInfo(amount, duration, buffType);
                 }
                 break;
         }

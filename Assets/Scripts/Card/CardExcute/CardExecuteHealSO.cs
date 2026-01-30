@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[CreateAssetMenu(menuName = "Card/CardExecute/Heal", fileName = "CardExecuteHealData")]
+[CreateAssetMenu(menuName = "SO/Card/CardExecute/Heal", fileName = "CardExecuteHealData")]
 public class CardExecuteHealSO : CardExecuteSO
 {
     //힐이 몇턴동안 지속되는지 여부

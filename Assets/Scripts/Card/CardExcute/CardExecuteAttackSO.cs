@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Card/CardExecute/Attack", fileName = "CardExecuteAttackData")]
+[CreateAssetMenu(menuName = "SO/Card/CardExecute/Attack", fileName = "CardExecuteAttackData")]
 public class CardExecuteAttackSO : CardExecuteSO
 {
     //Execute가 리스트로 바뀌어서 실행전 Execute들이 하나도 빠짐없이 실행가능한지 체크해야해서 추가

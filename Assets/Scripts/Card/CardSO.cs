@@ -11,7 +11,7 @@ public enum eTargetType
     Target, NotTarget
 }
 //(SO를 만든뒤 Resource/CardData폴더에 넣어둬야함)
-[CreateAssetMenu(menuName = "Card/Card Data", fileName = "CardData")]
+[CreateAssetMenu(menuName = "SO/Card/Card Data", fileName = "CardData")]
 public class CardSO : ScriptableObject
 {
     //유니티에서 제공하는 ScriptableObject를 이용해서 Inspector에서 Stage정보를 설정할 수 있도록 설정

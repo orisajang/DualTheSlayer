@@ -4,12 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum eBuffType
+public enum eConditionType
 {
     None, DotHealing ,Bleeding
 }
 
-public class PlayerBuffUI : MonoBehaviour
+public class PlayerConditionUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _buffAmountText;
     [SerializeField] private Image _buffImage;
@@ -21,28 +21,30 @@ public class PlayerBuffUI : MonoBehaviour
     //버프값과 버프 지속시간
     private int _amount;
     private int _duration;
-    private eBuffType _buffType;
+    private eConditionType _buffType;
 
     //이 객체를 생성해준 부모(Spawner)를 기억해둠. 반환할때 반환시키기 위해)
-    private PlayerBuffSpawner _buffSpawner;
+    private PlayerConditionSpawner _buffSpawner;
 
-    public void Init(PlayerBuffSpawner spawner)
+    public void Init(PlayerConditionSpawner spawner)
     {
         _buffSpawner = spawner;
     }
 
     //이미지는 잠시 안쓴다 가정하자
-    public void SetBuffInfo(int buffAmount, int buffDuration, eBuffType type)
+    public void SetConditionInfo(int buffAmount, int buffDuration, eConditionType type)
     {
         _amount = buffAmount;
         _duration = buffDuration;
         _buffType = type;
 
+        _buffImage.sprite = GameManager.Instance.GetConditionSprite(type);
+
         //UI요소 갱신
         UpdateUIElement();
     }
 
-    public void AddBuffInfo(int buffAmount, int buffDuration, eBuffType buffType)
+    public void AddConditionInfo(int buffAmount, int buffDuration, eConditionType buffType)
     {
         if(buffType != _buffType)
         {
@@ -64,7 +66,7 @@ public class PlayerBuffUI : MonoBehaviour
         //이미지는 아직 잘 모르겠음
     }
     //버프효과 1회 발동 (duration 1회 차감)
-    public bool ActivateBuffOnce()
+    public bool ActivateConditionOnce()
     {
         //버프가 끝나면 true보내고 안끝났으면 false보냄
         _duration -= 1;

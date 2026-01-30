@@ -54,14 +54,21 @@ public class GameManager : Singleton<GameManager>
     Dictionary<int, PlayerManager> _playerInstanceDic = new Dictionary<int, PlayerManager>();
     public IReadOnlyDictionary<int, PlayerManager> PlayerInstanceDic => _playerInstanceDic;
 
+    //플레이어의 상태이상별 어떤 이미지를 가지고있어야하는지
+    private Dictionary<eConditionType, Sprite> _playerConditionImageDic = new Dictionary<eConditionType, Sprite>();
+
     protected override void Awake()
     {
         isDestroyOnLoad = false;
         base.Awake();
 
+        //초기 설정
         //플레이어 갯수 구함
         _playerInstanceDic.Clear();
         CalcPlayerCount();
+        //플레이어가 가질수있는 상태이상의 아이콘 이미지 설정
+        _playerConditionImageDic.Clear();
+        InitPlayerConditionDic();
     }
 
     private IEnumerator Start()
@@ -138,6 +145,28 @@ public class GameManager : Singleton<GameManager>
             {
                 maxPlayerCount++;
             }
+        }
+    }
+
+    //플레이어가 가질수있는 상태이상의 종류별로 어떤 이미지를 표시해야하는지 딕셔너리 캐싱
+    public void InitPlayerConditionDic()
+    {
+        PlayerConditionTypeSO[] conditionSOArray = Resources.LoadAll<PlayerConditionTypeSO>("ConditionData").ToArray();
+        //enum값이 주어졌을때 Sprite를 반환하는 딕셔너리
+        foreach(PlayerConditionTypeSO condition in conditionSOArray)
+        {
+            _playerConditionImageDic.Add(condition.ConditionType, condition.Image);
+        }
+    }
+    public Sprite GetConditionSprite(eConditionType type)
+    {
+        if (_playerConditionImageDic.ContainsKey(type))
+        {
+            return _playerConditionImageDic[type];
+        }
+        else
+        {
+            return null;
         }
     }
 

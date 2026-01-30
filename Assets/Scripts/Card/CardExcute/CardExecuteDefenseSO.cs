@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Card/CardExecute/Defense", fileName = "CardExecuteDefenseData")]
+[CreateAssetMenu(menuName = "SO/Card/CardExecute/Defense", fileName = "CardExecuteDefenseData")]
 public class CardExecuteDefenseSO : CardExecuteSO
 {
     public override bool CanExecute(CardTargetInfoClass cardTargetInfoClass)

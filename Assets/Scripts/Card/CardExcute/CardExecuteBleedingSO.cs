@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //적에게 출혈 상태이상을 부여하는 SO 행동
-[CreateAssetMenu(menuName = "Card/CardExecute/Bleeding", fileName = "CardExecuteBleedingData")]
+[CreateAssetMenu(menuName = "SO/Card/CardExecute/Bleeding", fileName = "CardExecuteBleedingData")]
 public class CardExecuteBleedingSO : CardExecuteSO
 {
     [Header("출혈횟수")]
