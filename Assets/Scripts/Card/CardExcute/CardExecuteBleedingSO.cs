@@ -20,6 +20,8 @@ public class CardExecuteBleedingSO : CardExecuteSO
     }
     public override void Execute(CardTargetInfoClass cardTargetInfoClass)
     {
+        //공통 기능 사용(카드 풀에 반환)
+        base.Execute(cardTargetInfoClass);
         //피격자 출혈수치 증가
         cardTargetInfoClass.TargetPlayer.AddBleedingStatus(amount, bleedingCount, cardTargetInfoClass.cardInstanceData.Cost, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
         //카드 사용한사람 행동력 감소

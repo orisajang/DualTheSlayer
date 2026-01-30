@@ -12,10 +12,11 @@ public class CardExecuteDefenseSO : CardExecuteSO
 
     public override void Execute(CardTargetInfoClass info)
     {
+        //공통 기능 사용(카드 풀에 반환)
+        base.Execute(info);
         Debug.Log("Defense");
         //info.UseCardPlayer.AddPlayerShield()
         info.UseCardPlayer.AddPlayerShield(amount, info.cardInstanceData.Cost);
-        //플레이어의 손패에서 제거
-        info.UseCardPlayer.RemovePlayerHand(info.cardInstanceData);
+        
     }
 }

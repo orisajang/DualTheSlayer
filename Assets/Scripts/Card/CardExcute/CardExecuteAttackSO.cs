@@ -19,14 +19,12 @@ public class CardExecuteAttackSO : CardExecuteSO
 
     public override void Execute(CardTargetInfoClass cardTargetInfoClass)
     {
+        //공통 기능 사용(카드 풀에 반환)
+        base.Execute(cardTargetInfoClass);
         Debug.Log("공격 명령");
         //자신의 힘(Power)수치를 더해서 공격력에 추가시켜주면 될듯? 일단은 카드수치만 적용
 
         //상대에게 데미지 처리
         cardTargetInfoClass.TargetPlayer.TakeDamage(amount, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
-        //자신의 행동력 감소
-        //cardTargetInfoClass.UseCardPlayer.DecreaseEnergy(cardTargetInfoClass.cardInstanceData.Cost);
-        //플레이어의 손패에서 제거
-        cardTargetInfoClass.UseCardPlayer.RemovePlayerHand(cardTargetInfoClass.cardInstanceData);
     }
 }

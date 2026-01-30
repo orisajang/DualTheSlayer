@@ -59,10 +59,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
 
     //플레이어의 버프UI생성위치
     //[SerializeField] PlayerBuffUI _playerBuffUI; //이거 못함. 버프가 적용될때 이 스크립트를 생성해야하는것이기 떄문에
-    [SerializeField] PlayerConditionSpawner _playerConditionSpawner;  //플레이어버프UI를 오브젝트풀로 생성해주는 스크립트
-    //[SerializeField] Transform _buffUIMakePosition;
-    //[SerializeField] GameObject _buffUIPrefab;
-    Dictionary<eConditionType, PlayerConditionUI> _playerConditionTypeDic = new Dictionary<eConditionType, PlayerConditionUI>(); //버프 생성 및 저장해놓은 딕셔너리
+    //플레이어버프UI를 오브젝트풀로 생성해주는 스크립트
+    [SerializeField] PlayerConditionSpawner _playerConditionSpawner;  
+    //현재 해당 상태이상은 이 UI를 사용하고있다는것을 기억하기위해서 딕셔너리 사용, 버프 생성 및 저장해놓은 딕셔너리
+    Dictionary<eConditionType, PlayerConditionUI> _playerConditionTypeDic = new Dictionary<eConditionType, PlayerConditionUI>();
+    //상태이상 전략패턴으로 딕셔너리 캐싱
+    Dictionary<eConditionType, ConditionStrategy> _conditionStrategyDic = new Dictionary<eConditionType, ConditionStrategy>();
 
 
     public int CalcMaxHP(int level)
@@ -257,7 +259,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             if (photonView.IsMine)
             {
                 //bool isBuffEnd = _playerBuffTypeDic[eBuffType.Bleeding].ActivateBuffOnce();
-                photonView.RPC(nameof(ActivateBuffOnceRPC), RpcTarget.All, eConditionType.Bleeding);
+                photonView.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.Bleeding);
                 TakeDamage(bleedingAmount, BleedApplierId);
             }
         }
@@ -270,17 +272,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
     [PunRPC]
-    public void ActivateBuffOnceRPC(eConditionType type)
+    public void ActivateConditionTickOnceRPC(eConditionType type)
     {
-        //RPC로 버프 횟수를 1회 사용했다는거를 알린다
+        //RPC로 상태이상 횟수를 1회 적용했다는거를 알린다
         bool isBuffEnd = false;
-        switch(type)
-        {
-            case eConditionType.Bleeding:
-                isBuffEnd = _playerConditionTypeDic[type].ActivateConditionOnce();
-                break;
-        }
-
+        isBuffEnd = _playerConditionTypeDic[type].ActivateConditionOnce();
         if (isBuffEnd) _playerConditionTypeDic.Remove(type);
     }
 
@@ -317,40 +313,34 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     //버프가 없다면 만들어주고, 아니면 횟수를 추가해준다
     public void CreateOrAddBuffStatus(eConditionType buffType, int amount, int duration)
     {
-        switch(buffType)
+        Debug.Log("전략패턴 시작");
+        //전략패턴이 없을때만 새로 할당해주고 그 이후로는 계속 하나로 사용
+        switch (buffType)
         {
             case eConditionType.Bleeding:
-                if(!_playerConditionTypeDic.ContainsKey(buffType))
-                {
-                    //새로 만들어줌
-                    //PlayerBuffUI playerBuffUI = Instantiate(_buffUIPrefab, _buffUIMakePosition).GetComponent<PlayerBuffUI>();
-                    PlayerConditionUI playerConditionUI = _playerConditionSpawner.GetPlayerBuffUIByPool();
-                    playerConditionUI.SetConditionInfo(amount, duration, buffType);
-                    _playerConditionTypeDic.Add(buffType, playerConditionUI);
-                }
-                else
-                {
-                    //버프횟수 추가
-                    _playerConditionTypeDic[buffType].AddConditionInfo(amount, duration, buffType);
-                }
+                if (!_conditionStrategyDic.ContainsKey(buffType)) _conditionStrategyDic.Add(buffType, new ConditionBleedingStrategy());
+                break;
+            case eConditionType.DotHealing:
+                if (!_conditionStrategyDic.ContainsKey(buffType)) _conditionStrategyDic.Add(buffType, new ConditionHealStrategy());
                 break;
         }
+        _conditionStrategyDic[buffType].SetConditionUIData(_playerConditionSpawner, _playerConditionTypeDic, amount, duration, buffType);
     }
-
     public void AddDotHealStatus(int amount, int duration,int cardCost)
     {
         if(photonView.IsMine)
         {
             photonView.RPC(nameof(AddDotHealStatusRPC), RpcTarget.All, amount, duration);
         }
-        //행동력 감소
-        //DecreaseEnergy(cardCost);
     }
     [PunRPC]
     private void AddDotHealStatusRPC(int amount, int duration)
     {
         dotHealAmount = amount;
         dotHealDuration = duration;
+
+        //UI생성
+        CreateOrAddBuffStatus(eConditionType.DotHealing, amount, duration);
     }
     //공격 받음
     public void TakeDamage(int amount,int attackerActorID)
@@ -392,6 +382,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             dotHealAmount = 0;
         }
 
+        //UI 1회 발동
+        //_playerConditionTypeDic[eConditionType.DotHealing].ActivateConditionOnce();
+        if(photonView.IsMine)
+        {
+            photonView.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.DotHealing);
+        }
     }
     //행동력 감소할때 모두에게 알리기위해서 RPC
     [PunRPC]
