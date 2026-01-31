@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public enum eConditionType
 {
-    None, DotHealing ,Bleeding
+    None, DotHealing ,Bleeding, Power
 }
 
 public class PlayerConditionUI : MonoBehaviour
@@ -26,6 +26,8 @@ public class PlayerConditionUI : MonoBehaviour
     public int Amount => _amount;
     public int Duration => _duration;
 
+    private const int DIS_STACKABLE_CONDITION_DURATION = 1;
+
     //이 객체를 생성해준 부모(Spawner)를 기억해둠. 반환할때 반환시키기 위해)
     private PlayerConditionSpawner _buffSpawner;
 
@@ -35,29 +37,30 @@ public class PlayerConditionUI : MonoBehaviour
     }
 
     //이미지는 잠시 안쓴다 가정하자
-    public void SetConditionInfo(int buffAmount, int buffDuration, eConditionType type)
+    public void SetConditionInfo(int buffAmount, int buffDuration, eConditionType type, bool isStackAble)
     {
         _amount = buffAmount;
-        _duration = buffDuration;
+        //예외처리. 스택불가능한 상태이상은 무조건 1로 고정
+        if (isStackAble) { _duration = buffDuration; }
+        else { _duration = DIS_STACKABLE_CONDITION_DURATION; }
         _buffType = type;
-
         _buffImage.sprite = GameManager.Instance.GetConditionSprite(type);
 
         //UI요소 갱신
         UpdateUIElement();
     }
 
-    public void AddConditionInfo(int buffAmount, int buffDuration, eConditionType buffType)
+    public void AddConditionInfo(int buffAmount, int buffDuration, eConditionType buffType, bool isStackAble)
     {
         if(buffType != _buffType)
         {
             Debug.LogError($"버프 타입이 다릅니다 뭔가 에러");
             return;
         }
-
         _amount += buffAmount;
-        _duration += buffDuration;
-
+        //예외처리. 스택불가능한 상태이상은 무조건 1로 고정
+        if (isStackAble) { _duration += buffDuration; }
+        else { _duration = DIS_STACKABLE_CONDITION_DURATION; }
 
         //UI요소 갱신
         UpdateUIElement();

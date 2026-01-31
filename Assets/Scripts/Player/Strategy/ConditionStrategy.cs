@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class ConditionStrategy
 {
 
-    public abstract void SetConditionUIData(PlayerConditionSpawner playerConditionSpawner, Dictionary<eConditionType, PlayerConditionUI> playerConditionDic,int amount, int duration, eConditionType buffType);
+    public abstract void SetConditionUIData(PlayerConditionSpawner playerConditionSpawner, Dictionary<eConditionType, 
+        PlayerConditionUI> playerConditionDic,int amount, int duration, eConditionType buffType, bool isStackAble);
 
 }

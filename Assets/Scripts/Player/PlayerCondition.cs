@@ -8,7 +8,16 @@ public class PlayerCondition :MonoBehaviour
     //플레이어 매니저와 현재 객체의 PhotonView
     private PlayerManager _playerManager;
     private PhotonView _pv;
+    //플레이어 상태이상UI 딕셔너리 (이곳에 접근해서 타입별 상태이상량, 횟수에 접근할 수 있음)
     Dictionary<eConditionType, PlayerConditionUI> _conditionTypeDic;
+    //플레이어 상태이상중에서 다음턴에 무조건 삭제되는것들(힘, 방어도, 등등.. 이런 상태이상버프들은 지속시간 스택불가. 다음턴에 사라져야함)
+    Dictionary<eConditionType, bool> _conditionDurationStackableDic = new Dictionary<eConditionType, bool>()
+    {
+        { eConditionType.None, false},
+        { eConditionType.DotHealing, true},
+        { eConditionType.Bleeding, true},
+        { eConditionType.Power, false},
+    };
 
     //기타 상태이상들
     //도트힐 스택 (턴이 시작될때마다 힐을 함)
@@ -52,7 +61,7 @@ public class PlayerCondition :MonoBehaviour
         }
     }
     [PunRPC]
-    public void CheckBleedingStatusRPC()
+    private void CheckBleedingStatusRPC()
     {
         Debug.Log($"실행자 ID: {_pv.Owner.ActorNumber} 출혈량 {_conditionTypeDic[eConditionType.Bleeding].Amount}, 횟수 {_conditionTypeDic[eConditionType.Bleeding].Duration}");
         if (_conditionTypeDic[eConditionType.Bleeding].Duration > 0)
@@ -69,59 +78,85 @@ public class PlayerCondition :MonoBehaviour
 
             if (_pv.IsMine)
             {
-                //bool isBuffEnd = _playerBuffTypeDic[eBuffType.Bleeding].ActivateBuffOnce();
-                _pv.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.Bleeding);
                 _playerManager.TakeDamage(_conditionTypeDic[eConditionType.Bleeding].Amount, BleedApplierId);
+                //출혈 해제되었을경우 ID값 다시 초기화
+                if (_conditionTypeDic[eConditionType.Bleeding].Duration - 1 <= 0)
+                {
+                    BleedApplierId = INVALID_BLEED_APPLIER_ID;
+                }
+
+                _pv.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.Bleeding);
+               
             }
         }
+    }
+    //상태이상 중에서 무조건 다음턴에 삭제되어야하는 것들(힘,방어도 등등.. 이런것들을 한번에 체크해서 없애주기위한 메서드)
+    public void CheckDisStackableCondtions()
+    {
+        //예외처리
+        if (!_pv.IsMine || _conditionTypeDic == null) return;
 
-        //출혈 해제되었을경우 ID값 다시 초기화
-        if (_conditionTypeDic[eConditionType.Bleeding].Duration <= 0)
+        foreach (eConditionType type in _conditionDurationStackableDic.Keys)
         {
-            BleedApplierId = INVALID_BLEED_APPLIER_ID;
+            bool isStackAble = _conditionDurationStackableDic[type];
+            if (isStackAble == false)
+            {
+                if (_conditionTypeDic.ContainsKey(type))
+                {
+                    //다음턴에 삭제되는 상태이상들은 무조건 지속시간 1이므로 1회 감소시키면 사라지도록 구조가 짜져있음
+                    _pv.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, type); //무조건 버프가 사라질거임
+                }
+            }
         }
+    }
+    //플레이어의 힘 수치를 가져옴
+    public int GetPlayerPower()
+    {
+        //예외처리
+        if(_conditionTypeDic == null || !_conditionTypeDic.ContainsKey(eConditionType.Power))
+        {
+            return 0;
+        }
+        if(_conditionTypeDic[eConditionType.Power].Duration ==0)
+        {
+            Debug.LogError("Power횟수가 0임. 여기 오면 안되는데 뭔가 에러");
+            return 0;
+        }
+        //정상적이라면 바로 플레이어의 현재 힘을 보내준다
+        return _conditionTypeDic[eConditionType.Power].Amount;
     }
 
     //2. 상태이상 부여
-    //출혈 상태 부여 (효과는 카드 낼때마다 발동됨 -> CheckUseCardAfterEffect에서 실제 발동)
-    public void AddBleedingStatus(int amount, int duration, int cardCost, int applierActorNumber)
+    public void AddConditionStatus(eConditionType conditionType, int amount, int duration, int applierActorNumber)
     {
-        //여기서는 RPC로 출혈받는사람이 자기자신의 출혈수치만 증가시킴
-        Debug.Log($"시작전 부여자: {applierActorNumber}, 피격자: {_pv.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
-        //이 메서드는 다른사람이 생성한 네트워크 객체에 접근해서 RPC를 쏴주는거라 IsMine이 무조건 false임. IsMine체크하지말것
-        _pv.RPC(nameof(AddBleedingStatusRPC), RpcTarget.All, amount, duration, cardCost, applierActorNumber);
-        Debug.Log($"출혈 photonView.IsMine 들어왔다");
-    }
-    [PunRPC]
-    private void AddBleedingStatusRPC(int amount, int duration, int cardCost, int applierActorNumber)
-    {
-        Debug.Log($"RPC시작전 부여자: {applierActorNumber}, 피격자: {_pv.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
-        //bleedingAmount = amount;
-        //bleedingDuration = duration;
-        BleedApplierId = applierActorNumber;
+        //RPC로 보내주기위한 일반 메서드 사용
+        Debug.Log($"상태이상추가! 타입:{conditionType} 시작전 부여자: {applierActorNumber}, 피격자: {_pv.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
+        //지속시간 쌓일수있는 버프 유형인지 체크
+        bool isStackAble = _conditionDurationStackableDic[conditionType];
 
-        //UI생성
-        _playerManager.CreateOrAddBuffStatus(eConditionType.Bleeding, amount, duration);
-    }
-    public void AddDotHealStatus(int amount, int duration, int cardCost)
-    {
-        if (_pv.IsMine)
+        if (conditionType == eConditionType.DotHealing)
         {
-            _pv.RPC(nameof(AddDotHealStatusRPC), RpcTarget.All, amount, duration);
+            if (_pv.IsMine)
+            {
+                _pv.RPC(nameof(AddConditionRPC), RpcTarget.All, conditionType, amount, duration, applierActorNumber, isStackAble);
+            }
+        }
+        else
+        {
+            _pv.RPC(nameof(AddConditionRPC), RpcTarget.All, conditionType, amount, duration, applierActorNumber, isStackAble);
         }
     }
     [PunRPC]
-    private void AddDotHealStatusRPC(int amount, int duration)
+    private void AddConditionRPC(eConditionType conditionType, int amount, int duration, int applierActorNumber, bool isStackAble)
     {
-        //dotHealAmount = amount;
-        //dotHealDuration = duration;
+        if (conditionType == eConditionType.Bleeding) BleedApplierId = applierActorNumber;
 
-        //UI생성
-        _playerManager.CreateOrAddBuffStatus(eConditionType.DotHealing, amount, duration);
+        _playerManager.CreateOrAddBuffStatus(conditionType, amount, duration, isStackAble);
     }
+
     //3. 스택 1회 소모
     [PunRPC]
-    public void ActivateConditionTickOnceRPC(eConditionType type)
+    private void ActivateConditionTickOnceRPC(eConditionType type)
     {
         //RPC로 상태이상 횟수를 1회 적용했다는거를 알린다
         bool isBuffEnd = false;
@@ -129,16 +164,8 @@ public class PlayerCondition :MonoBehaviour
         if (isBuffEnd) _conditionTypeDic.Remove(type);
     }
     //회복 버프효과 1회 갱신
-    public void DecreseHealDuration()
+    private void DecreseHealDuration()
     {
-        //dotHealDuration -= 1;
-        //지속시간 다 끝나면 초기화
-        //if (dotHealDuration <= 0)
-        //{
-        //    dotHealAmount = 0;
-        //}
-        //UI 1회 발동
-        //_playerConditionTypeDic[eConditionType.DotHealing].ActivateConditionOnce();
         if (_pv.IsMine)
         {
             _pv.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.DotHealing);

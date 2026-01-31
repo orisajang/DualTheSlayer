@@ -25,6 +25,8 @@ public class CardExecuteAttackSO : CardExecuteSO
         //자신의 힘(Power)수치를 더해서 공격력에 추가시켜주면 될듯? 일단은 카드수치만 적용
 
         //상대에게 데미지 처리
-        cardTargetInfoClass.TargetPlayer.TakeDamage(amount, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
+        int addValue = cardTargetInfoClass.UseCardPlayer.PlayerCondition.GetPlayerPower();
+        Debug.Log($"힘으로 인해 {addValue} 숫자가 더해졌습니다");
+        cardTargetInfoClass.TargetPlayer.TakeDamage(amount + addValue, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
     }
 }

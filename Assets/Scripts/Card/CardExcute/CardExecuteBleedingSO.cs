@@ -23,8 +23,7 @@ public class CardExecuteBleedingSO : CardExecuteSO
         //공통 기능 사용(카드 풀에 반환)
         base.Execute(cardTargetInfoClass);
         //피격자 출혈수치 증가
-        cardTargetInfoClass.TargetPlayer.PlayerCondition.AddBleedingStatus(amount, bleedingCount, cardTargetInfoClass.cardInstanceData.Cost, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
-        //카드 사용한사람 행동력 감소
-        //cardTargetInfoClass.UseCardPlayer.DecreaseEnergy(cardTargetInfoClass.cardInstanceData.Cost);
+        //cardTargetInfoClass.TargetPlayer.PlayerCondition.AddBleedingStatus(amount, bleedingCount, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
+        cardTargetInfoClass.TargetPlayer.PlayerCondition.AddConditionStatus(eConditionType.Bleeding, amount, bleedingCount, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
     }
 }

@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerManager : MonoBehaviourPunCallbacks
 {
     //플레이어의 HP.. 등등이 있어야한다 일단은 보류
     //플레이어 ID (포톤에서 불러와서 설정할 예정, 일단은 임시 아이디 넣자)
@@ -161,12 +161,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         //카드를 한장 뽑는다
         DrawPlayerCard();
 
-        //만약에 플레이어에게 도트힐 상태가 있었다면 힐을 해준다.
+        //상태이상 체크
         if(_playerCondition != null)
         {
+            //만약에 플레이어에게 도트힐 상태가 있었다면 힐을 해준다.
             _playerCondition.CheckPlayerHealing();
+            //플레이어 턴 시작하자마자 없어져야하는 상태이상들 체크
+            _playerCondition.CheckDisStackableCondtions();
         }
-        
 
 
     }
@@ -220,7 +222,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     //버프가 없다면 만들어주고, 아니면 횟수를 추가해준다
-    public void CreateOrAddBuffStatus(eConditionType buffType, int amount, int duration)
+    public void CreateOrAddBuffStatus(eConditionType buffType, int amount, int duration, bool isStackAble)
     {
         Debug.Log("전략패턴 시작");
         //전략패턴이 없을때만 새로 할당해주고 그 이후로는 계속 하나로 사용
@@ -232,8 +234,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             case eConditionType.DotHealing:
                 if (!_conditionStrategyDic.ContainsKey(buffType)) _conditionStrategyDic.Add(buffType, new ConditionHealStrategy());
                 break;
+            case eConditionType.Power:
+                if (!_conditionStrategyDic.ContainsKey(buffType)) _conditionStrategyDic.Add(buffType, new ConditionPowerStrategy());
+                break;
         }
-        _conditionStrategyDic[buffType].SetConditionUIData(_playerConditionSpawner, _playerConditionTypeDic, amount, duration, buffType);
+        _conditionStrategyDic[buffType].SetConditionUIData(_playerConditionSpawner, _playerConditionTypeDic, amount, duration, buffType, isStackAble);
     }
     
 
@@ -331,19 +336,20 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
 
         }
     }
+    
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting) //서버에서 Write 상황일때
-        {
-            stream.SendNext(currentHp); //0번
-            stream.SendNext(shield); //1번
-        }
-        else if (stream.IsReading) //서버에서 Read 상황일때
-        {
-            this.currentHp = (int)stream.ReceiveNext(); // 0번
-            this.shield = (int)stream.ReceiveNext(); //1번 
-            UpdateHpBar();
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting) //서버에서 Write 상황일때
+    //    {
+    //        stream.SendNext(currentHp); //0번
+    //        stream.SendNext(shield); //1번
+    //    }
+    //    else if (stream.IsReading) //서버에서 Read 상황일때
+    //    {
+    //        this.currentHp = (int)stream.ReceiveNext(); // 0번
+    //        this.shield = (int)stream.ReceiveNext(); //1번 
+    //        UpdateHpBar();
+    //    }
+    //}
 }
