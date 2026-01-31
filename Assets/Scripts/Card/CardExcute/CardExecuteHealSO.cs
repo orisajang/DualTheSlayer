@@ -16,6 +16,6 @@ public class CardExecuteHealSO : CardExecuteSO
         //공통 기능 사용(카드 풀에 반환)
         base.Execute(cardTargetInfoClass);
         //힐 기능 사용
-        cardTargetInfoClass.UseCardPlayer.AddDotHealStatus(amount, duration,cardTargetInfoClass.cardInstanceData.Cost);
+        cardTargetInfoClass.UseCardPlayer.PlayerCondition.AddDotHealStatus(amount, duration,cardTargetInfoClass.cardInstanceData.Cost);
     }
 }

@@ -39,16 +39,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     public int shield { get; private set; }
     public int currentEnergy { get; private set; }
     private int maxEnergy = 3; // 일단 무조건 3이라고 가정하고 사용
-    //기타 상태이상들
-    //도트힐 스택 (턴이 시작될때마다 힐을 함)
-    public int dotHealAmount { get; private set; } //힐량
-    public int dotHealDuration { get; private set; } //힐 지속턴
-
-    //출혈 스택 (카드를 낼때마다 데미지를 받음)
-    private const int INVALID_BLEED_APPLIER_ID = -1; //출혈을 보유한 사람이 없는지 체크하기위해
-    public int bleedingAmount { get; private set; } //출혈 횟수
-    public int bleedingDuration { get; private set; } //출혈 지속턴
-    public int BleedApplierId { get; private set; } = INVALID_BLEED_APPLIER_ID;  //출혈을 부여한사람 ID (데미지처리를 위해서)
+    //기타 상태이상들을 처리하는 클래스 
+    [SerializeField] private PlayerCondition _playerCondition;
+    public PlayerCondition PlayerCondition => _playerCondition;
 
 
     //플레이어의 HP바
@@ -63,9 +56,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] PlayerConditionSpawner _playerConditionSpawner;  
     //현재 해당 상태이상은 이 UI를 사용하고있다는것을 기억하기위해서 딕셔너리 사용, 버프 생성 및 저장해놓은 딕셔너리
     Dictionary<eConditionType, PlayerConditionUI> _playerConditionTypeDic = new Dictionary<eConditionType, PlayerConditionUI>();
-    //상태이상 전략패턴으로 딕셔너리 캐싱
+    //각 상태이상별로 어떤 행동을 해야하는지 접근하기위해 전략패턴 + 딕셔너리 캐싱
     Dictionary<eConditionType, ConditionStrategy> _conditionStrategyDic = new Dictionary<eConditionType, ConditionStrategy>();
 
+    private void Awake()
+    {
+        //_playercondition = new PlayerCondition(this, photonView, _playerConditionTypeDic);
+    }
+    private void Start()
+    {
+        _playerCondition.Init(this, photonView, _playerConditionTypeDic);
+    }
 
     public int CalcMaxHP(int level)
     {
@@ -92,18 +93,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             DrawPlayerCard();
         }
         Debug.Log(playerHand.Count);
-        //플레이어 정보 설정
-        //InitPlayerStat(config.levelData); //RPC로 다같이하면될듯.
-    }
-    public void InitPlayerStat(PlayerLevelData levelData)
-    {
-        level = levelData.Level;
-        exp = levelData.Exp;
-        maxHp = CalcMaxHP(levelData.Level);
-        currentHp = maxHp;
-        shield = 0;
-
-        UpdateHpBar();
     }
     [PunRPC]
     public void RPC_Init(int lvl, int expoint, PhotonMessageInfo info)
@@ -173,18 +162,15 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         DrawPlayerCard();
 
         //만약에 플레이어에게 도트힐 상태가 있었다면 힐을 해준다.
-        CheckPlayerHealing();
-
-
-    }
-    //도트힐을 통해 턴시작 시 힐을 적용해야하는지 체크
-    public void CheckPlayerHealing()
-    {
-        if(dotHealDuration > 0)
+        if(_playerCondition != null)
         {
-            HealingPlayerSelf(dotHealAmount);
+            _playerCondition.CheckPlayerHealing();
         }
+        
+
+
     }
+    
     //더이상 자신의 턴이 아닐때 초기화해야할 항목들 모아둠
     public void RemovePlayerTurnInit()
     {
@@ -230,86 +216,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         DecreaseEnergy(cardCost);
 
         //카드 1회 내면 출혈효과 발동해야함. 추후  이펙트도 여기서 가능할듯 
-        CheckBleedingStatus();
-    }
-    public void CheckBleedingStatus()
-    {
-        //내 네트워크 객체이고, 출혈횟수가 0보다 클때만 발동
-        if(photonView.IsMine && bleedingDuration > 0)
-        {
-            photonView.RPC(nameof(CheckBleedingStatusRPC), RpcTarget.All);
-        }
-    }
-    [PunRPC]
-    public void CheckBleedingStatusRPC()
-    {
-        Debug.Log($"실행자 ID: {photonView.Owner.ActorNumber} 출혈량 {bleedingAmount}, 횟수 {bleedingDuration}");
-        if (bleedingDuration > 0)
-        {
-            //예외처리: 만약 출혈 부여자의 ID가 없는경우라면 이상함. 에러발생
-            if(BleedApplierId == INVALID_BLEED_APPLIER_ID)
-            {
-                Debug.LogError("출혈 보유자의 ID가 없습니다. 에러발생");
-                return;
-            }
-            bleedingDuration -= 1;
-            Debug.Log($"출혈 발동!! 데미지: {bleedingAmount} 남은출혈횟수: {bleedingDuration}");
-            //자기자신만 TakeDamage를 보내줌(1번만 보내야하므로)
-            
-            if (photonView.IsMine)
-            {
-                //bool isBuffEnd = _playerBuffTypeDic[eBuffType.Bleeding].ActivateBuffOnce();
-                photonView.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.Bleeding);
-                TakeDamage(bleedingAmount, BleedApplierId);
-            }
-        }
-        
-        //출혈 해제되었을경우 ID값 다시 초기화
-        if(bleedingDuration <= 0)
-        {
-            bleedingAmount = 0;
-            BleedApplierId = INVALID_BLEED_APPLIER_ID;
-        }
-    }
-    [PunRPC]
-    public void ActivateConditionTickOnceRPC(eConditionType type)
-    {
-        //RPC로 상태이상 횟수를 1회 적용했다는거를 알린다
-        bool isBuffEnd = false;
-        isBuffEnd = _playerConditionTypeDic[type].ActivateConditionOnce();
-        if (isBuffEnd) _playerConditionTypeDic.Remove(type);
+        _playerCondition.CheckBleedingStatus();
     }
 
-    //쉴드 생성
-    public void AddPlayerShield(int amount,int cardCost)
-    {
-        shield += amount;
-        UpdateHpBar();
-        //행동력 감소
-        //DecreaseEnergy(cardCost);
-    }
-    //출혈 상태 부여 (효과는 카드 낼때마다 발동됨 -> CheckUseCardAfterEffect에서 실제 발동)
-    public void AddBleedingStatus(int amount, int duration,int cardCost, int applierActorNumber)
-    {
-        //여기서는 RPC로 출혈받는사람이 자기자신의 출혈수치만 증가시킴
-        Debug.Log($"시작전 부여자: {applierActorNumber}, 피격자: {photonView.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
-        //이 메서드는 다른사람이 생성한 네트워크 객체에 접근해서 RPC를 쏴주는거라 IsMine이 무조건 false임. IsMine체크하지말것
-        photonView.RPC(nameof(AddBleedingStatusRPC), RpcTarget.All, amount, duration, cardCost, applierActorNumber);
-        Debug.Log($"출혈 photonView.IsMine 들어왔다");
-    }
-    [PunRPC]
-    private void AddBleedingStatusRPC(int amount, int duration, int cardCost, int applierActorNumber)
-    {
-        Debug.Log($"RPC시작전 부여자: {applierActorNumber}, 피격자: {photonView.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
-        bleedingAmount = amount;
-        bleedingDuration = duration;
-        BleedApplierId = applierActorNumber;
-
-        //UI생성
-        eConditionType bleedType = eConditionType.Bleeding;
-        //이미 출혈이 존재한다면
-        CreateOrAddBuffStatus(bleedType, amount, duration);
-    }
     //버프가 없다면 만들어주고, 아니면 횟수를 추가해준다
     public void CreateOrAddBuffStatus(eConditionType buffType, int amount, int duration)
     {
@@ -326,27 +235,32 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         _conditionStrategyDic[buffType].SetConditionUIData(_playerConditionSpawner, _playerConditionTypeDic, amount, duration, buffType);
     }
-    public void AddDotHealStatus(int amount, int duration,int cardCost)
-    {
-        if(photonView.IsMine)
-        {
-            photonView.RPC(nameof(AddDotHealStatusRPC), RpcTarget.All, amount, duration);
-        }
-    }
-    [PunRPC]
-    private void AddDotHealStatusRPC(int amount, int duration)
-    {
-        dotHealAmount = amount;
-        dotHealDuration = duration;
+    
 
-        //UI생성
-        CreateOrAddBuffStatus(eConditionType.DotHealing, amount, duration);
+    //쉴드 생성
+    public void AddPlayerShield(int amount,int cardCost)
+    {
+        shield += amount;
+        UpdateHpBar();
+        //행동력 감소
+        //DecreaseEnergy(cardCost);
     }
+    
     //공격 받음
     public void TakeDamage(int amount,int attackerActorID)
     {
         photonView.RPC(nameof(TakeDamageRPC), RpcTarget.All, amount, attackerActorID);
         //TakeDamageRPC(amount);
+    }
+    //데미지 받았을때 모두에게 데미지 받은사람 알리기위해서
+    [PunRPC]
+    public void TakeDamageRPC(int amount, int attackerActorID)
+    {
+        Debug.Log("TakeDamageRPC");
+        CalcDamage(amount);
+        UpdateHpBar();
+        //HP 0이되었는지확인
+        CheckHpZero(attackerActorID);
     }
     //플레이어 회복
     public void HealingPlayerSelf(int amount)
@@ -358,7 +272,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             photonView.RPC(nameof(HealingPlayerSelfRPC), RpcTarget.All, amount);
         }
     }
-
+    //자기자신 회복용도 RPC
+    [PunRPC]
+    public void HealingPlayerSelfRPC(int amount)
+    {
+        currentHp += amount;
+        if (currentHp > maxHp) currentHp = maxHp;
+        UpdateHpBar();
+    }
     //행동력 감소 메서드 (RPC 실행용도)
     public void DecreaseEnergy(int cardCost)
     {
@@ -367,28 +288,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
             photonView.RPC(nameof(DecreaseEnergyRPC), RpcTarget.All, cardCost);
         }
     }
-    //자기자신 회복용도 RPC
-    [PunRPC]
-    public void HealingPlayerSelfRPC(int amount)
-    {
-        currentHp += amount;
-        if (currentHp > maxHp) currentHp = maxHp;
-        UpdateHpBar();
-
-        dotHealDuration -= 1;
-        //지속시간 다 끝나면 초기화
-        if(dotHealDuration <= 0)
-        {
-            dotHealAmount = 0;
-        }
-
-        //UI 1회 발동
-        //_playerConditionTypeDic[eConditionType.DotHealing].ActivateConditionOnce();
-        if(photonView.IsMine)
-        {
-            photonView.RPC(nameof(ActivateConditionTickOnceRPC), RpcTarget.All, eConditionType.DotHealing);
-        }
-    }
+    
     //행동력 감소할때 모두에게 알리기위해서 RPC
     [PunRPC]
     private void DecreaseEnergyRPC(int cardCost)
@@ -403,16 +303,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         SetEnergyText(energy);
     }
-    //데미지 받았을때 모두에게 데미지 받은사람 알리기위해서
-    [PunRPC]
-    public void TakeDamageRPC(int amount, int attackerActorID)
-    {
-        Debug.Log("TakeDamageRPC");
-        CalcDamage(amount);
-        UpdateHpBar();
-        //HP 0이되었는지확인
-        CheckHpZero(attackerActorID);
-    }
+
     private void CalcDamage(int damage)
     {
         //쉴드량 계산해서 HP계산

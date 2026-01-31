@@ -23,6 +23,9 @@ public class PlayerConditionUI : MonoBehaviour
     private int _duration;
     private eConditionType _buffType;
 
+    public int Amount => _amount;
+    public int Duration => _duration;
+
     //이 객체를 생성해준 부모(Spawner)를 기억해둠. 반환할때 반환시키기 위해)
     private PlayerConditionSpawner _buffSpawner;
 
