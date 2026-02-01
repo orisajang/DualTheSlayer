@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: CardExecutePowerData
   m_EditorClassIdentifier: 
   amount: 3
+  cardType: 2

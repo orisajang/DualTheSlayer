@@ -5,7 +5,7 @@ using UnityEngine;
 
 public interface ICardMVPView
 {
-    public void SetCardResource(Sprite sprite, string text, string cost);
+    public void UpdateCardUI();
 }
 
 
@@ -19,9 +19,9 @@ public class CardPresenter
         cardView = view;
     }
     //카드 UI 갱신(아래의 플레이어 손패)
-    public void UpdateCardUI()
+    public void UpdateCardForUI()
     {
-        cardView.SetCardResource(cardModel.CardInstance.CardImage, cardModel.CardInstance.Description, cardModel.CardInstance.Cost.ToString());
+        cardView.UpdateCardUI();
     }
 
     public eTargetType GetInputType()

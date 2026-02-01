@@ -93,8 +93,8 @@ public class PlayerCondition :MonoBehaviour
     //상태이상 중에서 무조건 다음턴에 삭제되어야하는 것들(힘,방어도 등등.. 이런것들을 한번에 체크해서 없애주기위한 메서드)
     public void CheckDisStackableCondtions()
     {
-        //예외처리
-        if (!_pv.IsMine || _conditionTypeDic == null) return;
+        //예외처리(상태이상 체크이므로 조건에 맞아야 들어올수있음. 초기에 들어오지않게 return)
+        if (_pv == null || !_pv.IsMine || _conditionTypeDic == null) return;
 
         foreach (eConditionType type in _conditionDurationStackableDic.Keys)
         {
@@ -152,6 +152,8 @@ public class PlayerCondition :MonoBehaviour
         if (conditionType == eConditionType.Bleeding) BleedApplierId = applierActorNumber;
 
         _playerManager.CreateOrAddBuffStatus(conditionType, amount, duration, isStackAble);
+        //상태이상인 경우 카드 텍스트들을 다 확인해준다
+        _playerManager.UpdateAllCardDescription(); //버프설정될때 자신의 카드의 Text도 변경해줌
     }
 
     //3. 스택 1회 소모
@@ -161,7 +163,11 @@ public class PlayerCondition :MonoBehaviour
         //RPC로 상태이상 횟수를 1회 적용했다는거를 알린다
         bool isBuffEnd = false;
         isBuffEnd = _conditionTypeDic[type].ActivateConditionOnce();
-        if (isBuffEnd) _conditionTypeDic.Remove(type);
+        if (isBuffEnd)
+        {
+            _conditionTypeDic.Remove(type);
+            _playerManager.UpdateAllCardDescription(); //버프효과 종료되었으므로 카드의 Text도 변경해줌
+        }
     }
     //회복 버프효과 1회 갱신
     private void DecreseHealDuration()

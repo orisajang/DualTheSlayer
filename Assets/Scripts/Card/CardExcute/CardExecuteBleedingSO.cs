@@ -8,6 +8,9 @@ public class CardExecuteBleedingSO : CardExecuteSO
 {
     [Header("출혈횟수")]
     [SerializeField] private int bleedingCount;
+
+    public override string description => throw new System.NotImplementedException();
+
     public override bool CanExecute(CardTargetInfoClass cardTargetInfoClass)
     {
         //카드 사용가능한지 조건체크
@@ -18,6 +21,12 @@ public class CardExecuteBleedingSO : CardExecuteSO
         }
         return true;
     }
+
+    public override string CardInitDescription()
+    {
+        return $"적에게 출혈을 {amount}만큼 {bleedingCount}회 부여 ";
+    }
+
     public override void Execute(CardTargetInfoClass cardTargetInfoClass)
     {
         //공통 기능 사용(카드 풀에 반환)

@@ -24,17 +24,19 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
         CardModel cardModel = new CardModel();
         cardModel.Init(instance);
         cardPresenter = new CardPresenter(cardModel, this);
-        //카드 이미지, 설명을 갱신
-        cardPresenter.UpdateCardUI();
         //현재 카드의 데이터 설정
         cardInstanceData = cardPresenter.ReturnCardData();
+        //인스턴스의 데이터가 변경되었을때 알림을 받기위해
+        instance.OnCardDataUpdated += UpdateCardUI;
+        //카드 이미지, 설명을 갱신
+        UpdateCardUI();
     }
 
-    //Presenter에서 받아온 정보로 UI 갱신
-    public void SetCardResource(Sprite sprite, string text, string cost)
+    //낸 카드를 보여주기위해 카드정보를 수동으로 설정해야할때 사용
+    public void SetCardResourceForShowCard(Sprite sprite, string description, string cost)
     {
         cardImage.sprite = sprite;
-        cardDescription.text = text;
+        cardDescription.text = description;
         cardCost.text = cost;
     }
     public eTargetType GetTargetType()
@@ -42,8 +44,14 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
         eTargetType type = cardPresenter.GetInputType();
         return type;
     }
+    public void UpdateCardUI()
+    {
+        cardImage.sprite = cardInstanceData.CardImage;
+        cardDescription.text = cardInstanceData.Description;
+        cardCost.text = cardInstanceData.Cost.ToString();
+    }
 
-    //임시용-> 매개변수 player로 바꿔야함. 적이 들어오면 Presenter에 해당정보를 보내줘서 알아서 현재 카드를 실행하게 한다
+    //적이 들어오면 Presenter에 해당정보를 보내줘서 알아서 현재 카드를 실행하게 한다
     public void ExecuteCommand(PlayerManager enemyPlayer)
     {
         //무조건 자신한테 사용하는 버프 효과 (쉴드, 데미지증가, 힘증가)

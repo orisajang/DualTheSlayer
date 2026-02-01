@@ -28,7 +28,7 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
         Debug.Log("ShowUsedCard_RPC RPC시작");
         CardView cardInfoView = CardInfoViewPrefab;
         Sprite imageNameToSprite = GameManager.Instance.assetManager.ImageSearchDic[imageName];
-        cardInfoView.SetCardResource(imageNameToSprite, description, cost);
+        cardInfoView.SetCardResourceForShowCard(imageNameToSprite, description, cost);
         ShowCardInfoUI();
     }
     public void ShowUsedCard(string imageName, string description, string cost)

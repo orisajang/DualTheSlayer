@@ -4,10 +4,18 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "SO/Card/CardExecute/Power", fileName = "CardExecutePowerData")]
 public class CardExecutePowerSO : CardExecuteSO
 {
+    public override string description => throw new System.NotImplementedException();
+
     public override bool CanExecute(CardTargetInfoClass cardTargetInfoClass)
     {
         return true; //조건 없음
     }
+
+    public override string CardInitDescription()
+    {
+        return $"힘을 {amount}올립니다";
+    }
+
     public override void Execute(CardTargetInfoClass cardTargetInfoClass)
     {
         base.Execute(cardTargetInfoClass);

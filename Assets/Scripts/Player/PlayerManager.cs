@@ -2,6 +2,7 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
@@ -58,6 +59,36 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     Dictionary<eConditionType, PlayerConditionUI> _playerConditionTypeDic = new Dictionary<eConditionType, PlayerConditionUI>();
     //각 상태이상별로 어떤 행동을 해야하는지 접근하기위해 전략패턴 + 딕셔너리 캐싱
     Dictionary<eConditionType, ConditionStrategy> _conditionStrategyDic = new Dictionary<eConditionType, ConditionStrategy>();
+
+    //특정 상태이상(버프)가 적용되면 모든카드를 조건에 따라 카드설명 변경해야함
+    public void UpdateAllCardDescription()
+    {
+        //자기자신것이 아니라면 바로 return (자기자신의 손패의 카드의 정보를 설정하는 것이므로)
+        if (!photonView.IsMine) return;
+
+        //자신의 힘, 수비스킬 위력 증가 등 카드능력치에에 영향갈만한 변수들을 정의
+        int plyPower = 0;
+        
+        //설정 (딕셔너리에서 설정값 꺼내서 넣어주기
+        if(_playerConditionTypeDic.ContainsKey(eConditionType.Power))
+        {
+            plyPower = _playerConditionTypeDic[eConditionType.Power].Amount;
+        }
+
+        foreach(CardInstance card in playerHand)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(CardExecuteSO executeSO in card.ExecuteSOList)
+            {
+                Debug.Log("돌아가면서 힘을 체크합니다");
+                //바뀐 카드 정보들을 sb에 담음
+                sb.Append(executeSO.CardSetDescription(plyPower));
+            }
+            //데이터 수정 (수정하면 자동으로 UI도 이벤트로인해 바뀜)
+            card.SetCardInstanceData(sb.ToString());
+        }
+    }
+
 
     private void Awake()
     {

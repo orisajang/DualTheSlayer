@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: CardExecuteBleedingData
   m_EditorClassIdentifier: 
   amount: 4
+  cardType: 2
   bleedingCount: 3
-  type: 2
-  conditionImage: {fileID: 21300000, guid: 2a6ca9b4cf97b0f4faf97144106538d5, type: 3}
