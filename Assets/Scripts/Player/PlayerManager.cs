@@ -20,16 +20,19 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
     //시작 플레이 카드
     [SerializeField,Tooltip("플레이어 시작 카드 수")] int startCardCount = 5;
-    [SerializeField] RectTransform _cardSpawnPosition;
-    [SerializeField] GameObject _cardPrefab;
+    RectTransform _cardSpawnPosition;
+    GameObject _cardPrefab;
 
     //카드 내는 제한선
-    [SerializeField] RectTransform _useCardLine;
+    RectTransform _useCardLine;
 
     //게임화면에서 에너지를 표시하는 텍스트UI가 어디에있는지
-    [SerializeField] TextMeshProUGUI _energyTextUI;
+    TextMeshProUGUI _energyTextUI;
     //최대 카드 보유가능 갯수 
     [SerializeField] int limitMaxCard = 10;
+    //플레이어가 데미지/힐 받을때 데미지량/힐량을 표시하는 텍스트가 생성되는 위치와 생성될 프리팹
+    [SerializeField] GameObject _damageFontSpawnPosition;
+    [SerializeField] GameObject _damageFontPrefab;
 
 
     //플레이어의 스탯
@@ -281,6 +284,13 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         //행동력 감소
         //DecreaseEnergy(cardCost);
     }
+
+    //데미지, 혹은 힐량이 몇만큼 적용되었는지 알리기위한 UI를 생성한다
+    public void MakeDamageFontUIForShow(int amount, bool isDamage)
+    {
+        UIDamageString uIDamageString = Instantiate(_damageFontPrefab, _damageFontSpawnPosition.transform).GetComponent<UIDamageString>();
+        uIDamageString.SetAndStartDamageText(amount, isDamage);
+    }
     
     //공격 받음
     public void TakeDamage(int amount,int attackerActorID)
@@ -297,6 +307,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         UpdateHpBar();
         //HP 0이되었는지확인
         CheckHpZero(attackerActorID);
+        //얼마만큼 데미지를 받았는지 UI를 띄운다
+        MakeDamageFontUIForShow(amount,true);
     }
     //플레이어 회복
     public void HealingPlayerSelf(int amount)
@@ -315,6 +327,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         currentHp += amount;
         if (currentHp > maxHp) currentHp = maxHp;
         UpdateHpBar();
+        //얼마만큼 힐을 받았는지 UI를 띄운다
+        MakeDamageFontUIForShow(amount, false);
     }
     //행동력 감소 메서드 (RPC 실행용도)
     public void DecreaseEnergy(int cardCost)
