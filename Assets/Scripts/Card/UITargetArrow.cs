@@ -7,21 +7,40 @@ public class UITargetArrow : MonoBehaviour
 
     RectTransform rect;
 
+    Canvas canvas;
+
     void Awake()
     {
         rect = GetComponent<RectTransform>();
+        canvas = GetComponentInParent<Canvas>();
         gameObject.SetActive(false);
     }
-
+    // 월드/스크린 좌표를 Canvas 로컬 좌표로 변환
+    private Vector2 WorldToCanvasPosition(Vector2 position)
+    {
+        Vector2 localPoint;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvas.transform as RectTransform,
+            position,
+            canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera,
+            out localPoint
+        );
+        return localPoint;
+    }
     public void Show(Vector2 start, Vector2 end)
     {
         gameObject.SetActive(true);
 
+        Vector2 localStart = WorldToCanvasPosition(start);
+        Vector2 localEnd = WorldToCanvasPosition(end);
+
+
         //부모를 "시작점"으로 이동
-        rect.position = start;
+        //rect.position = start;
+        rect.anchoredPosition = localStart;
 
         //목표 지점과 길이를 구한다
-        Vector2 dir = end - start;
+        Vector2 dir = localEnd - localStart;
         float length = dir.magnitude; // 두 벡터를 더할때 이동한 결과위치(magnitude)
 
         // 회전
