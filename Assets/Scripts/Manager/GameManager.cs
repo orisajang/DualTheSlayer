@@ -260,10 +260,22 @@ public class GameManager : Singleton<GameManager>
         }
 
     }
-
+    //게임결과창 열기 
     public void ShowGameResultPanel(string gameResult, string resultInfo )
     {
-        gameResultPanelManager.ActiveResultPanelAndSetInfo(gameResult, resultInfo);
+        bool isPlayer = false;
+        //모든 플레이어 돌면서 이게 자기꺼면 자신이 플레이어라는것을 확인
+        foreach(int actorNum in _playerInstanceDic.Keys)
+        {
+            if(_playerInstanceDic[actorNum].photonView.IsMine) { isPlayer = true; } 
+        }
+        gameResultPanelManager.ActiveResultPanelAndSetInfo(gameResult, resultInfo, isPlayer);
+    }
+    //자신이 게임 플레이어인지 확인하는 메서드
+    public bool CheckPlayerAble(int actorNumber)
+    {
+        if(_playerInstanceDic.ContainsKey(actorNumber)) { return true; }
+        else { return false; }
     }
 
     #region GameManager에 있는 매니저들을 설정하고, 할당해제하기위한 메서드

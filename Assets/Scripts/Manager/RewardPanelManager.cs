@@ -25,6 +25,7 @@ public class RewardPanelManager : MonoBehaviour
     //DB의 현재 플레이어 ID - 인벤토리에 카드 1개 등록
     private void GetCardAndLeaveRoom()
     {
+        if (_selectedCardReward == null) return;
         //선택한 카드 추가
         GameManager.Instance.inGameNetworkMgr.AddPlayerInventoryCard(_selectedCardReward.CardId);
         //방 떠나기
