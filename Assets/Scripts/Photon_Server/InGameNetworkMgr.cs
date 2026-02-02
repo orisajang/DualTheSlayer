@@ -1,3 +1,5 @@
+using Firebase.Auth;
+using Firebase.Database;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
@@ -115,5 +117,15 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
         string resultInfo = $"{deadPlayerActorNumber} 패배. {defeatPlayerAddExp}의 경험치 획득 \n" +
             $"{attackerActorID} 승리. {victoryPlayerAddExp}의 경험치 획득";
         GameManager.Instance.ShowGameResultPanel(gameResult, resultInfo);
+    }
+
+    //파이어베이스를 통해 카드ID값을 저장
+    public void AddPlayerInventoryCard(string cardId)
+    {
+        DatabaseReference dbRef = NetworkEventManager.Instance.GetInvenRef();
+
+        //1개만 추가하면 되므로 이렇게 고유 키값을 추가하면 된다고 한다
+        string key = dbRef.Push().Key;
+        dbRef.Child(key).SetValueAsync(cardId);
     }
 }

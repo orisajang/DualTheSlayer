@@ -14,7 +14,7 @@ public class NetworkEventManager : MonoBehaviourPunCallbacks
     //방을 떠나고 로비를 입장할때 등 씬 이동 시 계속 살아있지않으면 이벤트를 받을 수없는 상황에 사용하는 매니저
     public static NetworkEventManager Instance { get; private set; }
 
-    //네트워크 전체에서 쓰는 고정된 이름들
+    //네트워크 전체에서 쓰는 고정된 이름들 (포톤에서 사용중)
     public const string GamePlayerId = "GamePlayerID";
     public const string PLAYER_SEATS = "Player";
     public const string SPECTOR_SEATS = "Spector";
@@ -22,7 +22,7 @@ public class NetworkEventManager : MonoBehaviourPunCallbacks
     public const string SeatIndex = "SeatIndex";
     
 
-
+    //DB전역에서 쓰는 주소경로
     //전역에서 쓰는 덱 주소경로
     public DatabaseReference GetDeckRef()
     {

@@ -41,7 +41,7 @@ public class DeckDragableArea : MonoBehaviour,
             CardInfoPrefab invenData = prefab.GetComponent<CardInfoPrefab>();
             invenData.transform.SetParent(prefab.OriginParent);
             DeckPoolSpawner.Instance.ReturnInvenCardToPool(invenData);
-            CardInfoPrefab deckCard = DeckPoolSpawner.Instance.GetInventoryCardByPool();
+            CardInfoPrefab deckCard = DeckPoolSpawner.Instance.GetDeckCardByPool();
             deckCard.SetCardData(invenData.cardData);
         }
         

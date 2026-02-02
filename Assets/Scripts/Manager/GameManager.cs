@@ -41,6 +41,7 @@ public class GameManager : Singleton<GameManager>
     
     //카드ID가 string으로 주어졌을때, 어떤 카드가 매칭되어야하는지 캐싱한 딕셔너리
     Dictionary<string, CardSO> cardSODic = new Dictionary<string, CardSO>();
+    public IReadOnlyDictionary<string, CardSO> CardSODic => cardSODic;
     //Firebase DB에서 불러온 자신의 원본덱 목록들
     List<CardSO> deckCardList = new List<CardSO>();
 
