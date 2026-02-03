@@ -1,11 +1,8 @@
 using Photon.Pun;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviourPunCallbacks
@@ -78,6 +75,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public AudioClip AttackClip => _attackClip;
     public AudioClip BuffClip => _buffClip;
     public AudioClip BleedClip => _bleedClip;
+
+    //이펙트
+    [SerializeField] private GameObject _attackEffect;
+    [SerializeField] private GameObject _powerUpEffect;
+    [SerializeField] private GameObject _bloodEffect;
+    [SerializeField] private GameObject _ShieldEffect;
+    [SerializeField] private GameObject _healEffect;
+
+    public GameObject PowerUpEffect => _powerUpEffect;
+    public GameObject BloodEffect => _bloodEffect;
+
 
     //특정 상태이상(버프)가 적용되면 모든카드를 조건에 따라 카드설명 변경해야함
     public void UpdateAllCardDescription()
@@ -317,6 +325,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         UpdateHpBar();
         //소리재생
         SoundManager.Instance.PlayEffectSound(_audioSource, _shieldClip);
+        //이펙트 재생
+        EffectManager.Instance.Play(_ShieldEffect, transform.position);
     }
 
     //데미지, 혹은 힐량이 몇만큼 적용되었는지 알리기위한 UI를 생성한다
@@ -346,15 +356,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     }
     //모두가 플레이어 공격 소리를 들어야 하므로 RPC메서드 추가
     [PunRPC]
-    private void PlayPlayerAttackSoundRPC()
+    private void PlayAttackSoundAndEffectRPC(Vector3 pos)
     {
         //소리 재생
         SoundManager.Instance.PlayEffectSound(_audioSource, _attackClip);
+        //이펙트 재생
+        EffectManager.Instance.Play(_attackEffect, pos);
     }
     
-    public void PlayPlayerAttackSound()
+    public void PlayAttackSoundAndEffect(Vector3 pos)
     {
-        photonView.RPC(nameof(PlayPlayerAttackSoundRPC), RpcTarget.All);
+        photonView.RPC(nameof(PlayAttackSoundAndEffectRPC), RpcTarget.All, pos);
     }
     //플레이어 회복
     public void HealingPlayerSelf(int amount)
@@ -377,6 +389,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         MakeDamageFontUIForShow(amount, false);
         //사운드 재생
         SoundManager.Instance.PlayEffectSound(_audioSource,_healClip);
+        //이펙트 재생
+        EffectManager.Instance.Play(_healEffect, transform.position);
     }
     //행동력 감소 메서드 (RPC 실행용도)
     public void DecreaseEnergy(int cardCost)

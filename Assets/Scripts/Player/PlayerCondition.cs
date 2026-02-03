@@ -77,6 +77,8 @@ public class PlayerCondition :MonoBehaviour
             //자기자신만 TakeDamage를 보내줌(1번만 보내야하므로)
             //소리 발동
             SoundManager.Instance.PlayEffectSound(_playerManager.AudioSource,_playerManager.BleedClip);
+            //이펙트 발동 
+            EffectManager.Instance.Play(_playerManager.BloodEffect, _playerManager.transform.position);
 
             if (_pv.IsMine)
             {
@@ -152,7 +154,11 @@ public class PlayerCondition :MonoBehaviour
     private void AddConditionRPC(eConditionType conditionType, int amount, int duration, int applierActorNumber, bool isStackAble)
     {
         if (conditionType == eConditionType.Bleeding) BleedApplierId = applierActorNumber;
-        else if (conditionType == eConditionType.Power) { SoundManager.Instance.PlayEffectSound(_playerManager.AudioSource,_playerManager.BuffClip); } //소리 발동
+        else if (conditionType == eConditionType.Power) 
+        { 
+            SoundManager.Instance.PlayEffectSound(_playerManager.AudioSource,_playerManager.BuffClip); //소리 발동
+            EffectManager.Instance.Play(_playerManager.PowerUpEffect, _playerManager.transform.position); //이펙트 발동
+        } 
 
 
         _playerManager.CreateOrAddBuffStatus(conditionType, amount, duration, isStackAble);

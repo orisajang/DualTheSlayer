@@ -44,6 +44,6 @@ public class CardExecuteAttackSO : CardExecuteSO
         //실제 데미지 처리하는 메서드로 이동
         cardTargetInfoClass.TargetPlayer.TakeDamage(amount + addValue, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
         //소리 재생
-        cardTargetInfoClass.UseCardPlayer.PlayPlayerAttackSound();
+        cardTargetInfoClass.UseCardPlayer.PlayAttackSoundAndEffect(cardTargetInfoClass.TargetPlayer.transform.position);
     }
 }
