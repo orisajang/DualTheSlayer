@@ -154,6 +154,7 @@ MonoBehaviour:
   _createNewRoomButton: {fileID: 1504298070}
   _createNewRoomPanel: {fileID: 615212456}
   _createroomUI: {fileID: 615212460}
+  _lobbyBgm: {fileID: 8300000, guid: 1816e8a51096d944db7e9282ed3d1ca3, type: 3}
 --- !u!4 &13429211
 Transform:
   m_ObjectHideFlags: 0

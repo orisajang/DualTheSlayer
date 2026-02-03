@@ -11,6 +11,7 @@ public class TitleMgr : MonoBehaviourPunCallbacks
     string gameVersion = "1.0";
 
     [SerializeField] Button goLobbyButton;
+    [SerializeField] AudioClip _titelSound;
 
     private void Awake()
     {
@@ -23,6 +24,10 @@ public class TitleMgr : MonoBehaviourPunCallbacks
 
         //버튼 연결
         goLobbyButton.onClick.AddListener(OnGoToLobby);
+    }
+    public void Start()
+    {
+        SoundManager.Instance.PlayBackgroundMusic(_titelSound);
     }
     private void OnDestroy()
     {

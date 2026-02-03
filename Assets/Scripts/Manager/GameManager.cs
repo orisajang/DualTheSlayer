@@ -62,6 +62,7 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] List<GameObject> _characterModelPrefabs;
     public IReadOnlyList<GameObject> CharacterModelPrefabs => _characterModelPrefabs;
 
+    [SerializeField] AudioClip _inGamebgm;
     protected override void Awake()
     {
         isDestroyOnLoad = false;
@@ -78,8 +79,9 @@ public class GameManager : Singleton<GameManager>
 
     private IEnumerator Start()
     {
-        //임시용 (플레이어 아이디 설정하기위해서
         yield return null;
+        //BGM재생
+        SoundManager.Instance.PlayBackgroundMusic(_inGamebgm);
         //자신의 카드를 DB에서 불러와서 설정하자.
         //1. 카드의 전체 정보를 저장하고있는 딕셔너리가 있어야한다. 
         //2. DB-덱에서 자신의 카드 정보를 불러온다. (무조건 있다고 가정.)

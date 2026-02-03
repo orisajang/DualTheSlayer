@@ -660,9 +660,9 @@ Transform:
   m_GameObject: {fileID: 319783978}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.91, y: 0, z: 0}
+  m_LocalPosition: {x: -4.91, y: -0.45, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1330814735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1601,6 +1601,7 @@ MonoBehaviour:
   _characterModelPrefabs:
   - {fileID: 8403695030359766227, guid: b2b9cfc69109063459776c5cb950a6a9, type: 3}
   - {fileID: 7182723545819822547, guid: 3b9a845d230c57646bb9ebd9576a6d68, type: 3}
+  _inGamebgm: {fileID: 8300000, guid: b442123a67071894ca2beeb4a6185aae, type: 3}
 --- !u!4 &1016278118
 Transform:
   m_ObjectHideFlags: 0
@@ -3314,7 +3315,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7372549, g: 0.7372549, b: 0.7372549, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3409,9 +3410,9 @@ Transform:
   m_GameObject: {fileID: 1845481729}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.24, y: 0, z: 0}
+  m_LocalPosition: {x: 5.24, y: -0.45, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1330814735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

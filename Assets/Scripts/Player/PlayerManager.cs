@@ -66,6 +66,19 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     //플레이어의 캐릭터 모델프리팹이 생성되는 위치
     [SerializeField] GameObject modelParent;
 
+    //소리 설정 (추후에는 각자 SO가 SoundClip을 가지고있어서 거기서 PlayerManager의 메서드에 접근하는 식으로 하면 좋을듯)
+    [SerializeField] AudioSource _audioSource;
+    [SerializeField] AudioClip _attackClip;
+    [SerializeField] AudioClip _healClip;
+    [SerializeField] AudioClip _buffClip;
+    [SerializeField] AudioClip _bleedClip;
+    [SerializeField] AudioClip _shuffleClip;
+    [SerializeField] AudioClip _shieldClip;
+    public AudioSource AudioSource => _audioSource;
+    public AudioClip AttackClip => _attackClip;
+    public AudioClip BuffClip => _buffClip;
+    public AudioClip BleedClip => _bleedClip;
+
     //특정 상태이상(버프)가 적용되면 모든카드를 조건에 따라 카드설명 변경해야함
     public void UpdateAllCardDescription()
     {
@@ -95,11 +108,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         }
     }
 
-
-    private void Awake()
-    {
-        //_playercondition = new PlayerCondition(this, photonView, _playerConditionTypeDic);
-    }
     private void Start()
     {
         _playerCondition.Init(this, photonView, _playerConditionTypeDic);
@@ -198,6 +206,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         arrorUI.Init();
         CardInputController cardInputController = cardView.GetComponent<CardInputController>();
         cardInputController.Init();
+
+        //카드 소리 재생
+        SoundManager.Instance.PlayEffectSound(_audioSource, _shuffleClip);
     }
     //플레이어 턴이 시작될때 초기화해야할 속성을 모아둠
     public void SetPlyerTurnInit(TextMeshProUGUI text)
@@ -294,10 +305,18 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     //쉴드 생성
     public void AddPlayerShield(int amount,int cardCost)
     {
+        if (photonView.IsMine)
+        {
+            photonView.RPC(nameof(AddPlayerShieldRPC), RpcTarget.All, amount, cardCost);
+        }
+    }
+    [PunRPC]
+    private void AddPlayerShieldRPC(int amount, int cardCost)
+    {
         shield += amount;
         UpdateHpBar();
-        //행동력 감소
-        //DecreaseEnergy(cardCost);
+        //소리재생
+        SoundManager.Instance.PlayEffectSound(_audioSource, _shieldClip);
     }
 
     //데미지, 혹은 힐량이 몇만큼 적용되었는지 알리기위한 UI를 생성한다
@@ -325,6 +344,18 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         //얼마만큼 데미지를 받았는지 UI를 띄운다
         MakeDamageFontUIForShow(amount,true);
     }
+    //모두가 플레이어 공격 소리를 들어야 하므로 RPC메서드 추가
+    [PunRPC]
+    private void PlayPlayerAttackSoundRPC()
+    {
+        //소리 재생
+        SoundManager.Instance.PlayEffectSound(_audioSource, _attackClip);
+    }
+    
+    public void PlayPlayerAttackSound()
+    {
+        photonView.RPC(nameof(PlayPlayerAttackSoundRPC), RpcTarget.All);
+    }
     //플레이어 회복
     public void HealingPlayerSelf(int amount)
     {
@@ -344,6 +375,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         UpdateHpBar();
         //얼마만큼 힐을 받았는지 UI를 띄운다
         MakeDamageFontUIForShow(amount, false);
+        //사운드 재생
+        SoundManager.Instance.PlayEffectSound(_audioSource,_healClip);
     }
     //행동력 감소 메서드 (RPC 실행용도)
     public void DecreaseEnergy(int cardCost)
@@ -396,20 +429,5 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
         }
     }
-    
-
-    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    //{
-    //    if (stream.IsWriting) //서버에서 Write 상황일때
-    //    {
-    //        stream.SendNext(currentHp); //0번
-    //        stream.SendNext(shield); //1번
-    //    }
-    //    else if (stream.IsReading) //서버에서 Read 상황일때
-    //    {
-    //        this.currentHp = (int)stream.ReceiveNext(); // 0번
-    //        this.shield = (int)stream.ReceiveNext(); //1번 
-    //        UpdateHpBar();
-    //    }
-    //}
+   
 }

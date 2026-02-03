@@ -75,6 +75,8 @@ public class PlayerCondition :MonoBehaviour
             //bleedingDuration -= 1;
             Debug.Log($"출혈 발동!! 데미지: {_conditionTypeDic[eConditionType.Bleeding].Amount} 남은출혈횟수: {_conditionTypeDic[eConditionType.Bleeding].Duration - 1}");
             //자기자신만 TakeDamage를 보내줌(1번만 보내야하므로)
+            //소리 발동
+            SoundManager.Instance.PlayEffectSound(_playerManager.AudioSource,_playerManager.BleedClip);
 
             if (_pv.IsMine)
             {
@@ -150,6 +152,8 @@ public class PlayerCondition :MonoBehaviour
     private void AddConditionRPC(eConditionType conditionType, int amount, int duration, int applierActorNumber, bool isStackAble)
     {
         if (conditionType == eConditionType.Bleeding) BleedApplierId = applierActorNumber;
+        else if (conditionType == eConditionType.Power) { SoundManager.Instance.PlayEffectSound(_playerManager.AudioSource,_playerManager.BuffClip); } //소리 발동
+
 
         _playerManager.CreateOrAddBuffStatus(conditionType, amount, duration, isStackAble);
         //상태이상인 경우 카드 텍스트들을 다 확인해준다

@@ -11,6 +11,7 @@ public class UILobbyManager : Singleton<UILobbyManager>
     [SerializeField] GameObject _createNewRoomPanel;
     [SerializeField] CreateRoomUI _createroomUI;
 
+    [SerializeField] AudioClip _lobbyBgm;
     protected override void Awake()
     {
         isDestroyOnLoad = false;
@@ -26,6 +27,10 @@ public class UILobbyManager : Singleton<UILobbyManager>
     {
         _createNewRoomPanel.SetActive(true);
         _createroomUI.Init(this, lobbyMgr);
+    }
+    private void Start()
+    {
+        SoundManager.Instance.PlayBackgroundMusic(_lobbyBgm);
     }
 
     public void SetLobbyManager(LobbyNetworkMgr manager)

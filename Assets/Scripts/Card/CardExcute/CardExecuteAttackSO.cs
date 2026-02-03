@@ -43,5 +43,7 @@ public class CardExecuteAttackSO : CardExecuteSO
         Debug.Log($"힘으로 인해 {addValue} 숫자가 더해졌습니다");
         //실제 데미지 처리하는 메서드로 이동
         cardTargetInfoClass.TargetPlayer.TakeDamage(amount + addValue, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
+        //소리 재생
+        cardTargetInfoClass.UseCardPlayer.PlayPlayerAttackSound();
     }
 }
