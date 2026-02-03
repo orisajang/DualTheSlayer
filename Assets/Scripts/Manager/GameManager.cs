@@ -135,7 +135,7 @@ public class GameManager : Singleton<GameManager>
             //개인만 가지고있어야하는 설정을 Init로 만들음
             playerManager.Init(config);
             //모두가 네트워크에 보여야하는것들 설정을 위해 RPC로 보냄
-            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.AllBuffered, playerLevelData.Level,playerLevelData.Exp);
+            playerManager.photonView.RPC(nameof(playerManager.RPC_Init), RpcTarget.AllBuffered, playerLevelData.Level,playerLevelData.Exp, ply.ActorNumber);
             //생성 위치에 따라서 고정된 캐릭터 모델을 사용.
             playerManager.photonView.RPC(nameof(playerManager.RPC_InitCharacterModel), RpcTarget.AllBuffered, spawnIndex);
 

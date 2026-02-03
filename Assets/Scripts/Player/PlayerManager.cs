@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviourPunCallbacks
@@ -59,6 +60,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     Dictionary<eConditionType, PlayerConditionUI> _playerConditionTypeDic = new Dictionary<eConditionType, PlayerConditionUI>();
     //각 상태이상별로 어떤 행동을 해야하는지 접근하기위해 전략패턴 + 딕셔너리 캐싱
     Dictionary<eConditionType, ConditionStrategy> _conditionStrategyDic = new Dictionary<eConditionType, ConditionStrategy>();
+
+    //플레이어 이름 표시 UI 위치
+    [SerializeField] PlayerNameUI _playerNameUI;
 
     //플레이어의 캐릭터 모델프리팹이 생성되는 위치
     [SerializeField] GameObject modelParent;
@@ -146,9 +150,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks
             DrawPlayerCard();
         }
         Debug.Log(playerHand.Count);
+        
     }
     [PunRPC]
-    public void RPC_Init(int lvl, int expoint, PhotonMessageInfo info)
+    public void RPC_Init(int lvl, int expoint, int id)
     {
         level = lvl;
         exp = expoint;
@@ -157,6 +162,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         shield = 0;
 
         UpdateHpBar();
+        //플레이어 이름 표시
+        _playerNameUI.SetPlayerName(id.ToString(), photonView.IsMine);
     }
     [PunRPC]
     public void RPC_InitCharacterModel(int index)
