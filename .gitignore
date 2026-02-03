@@ -78,6 +78,10 @@ crashlytics-build.properties
 /[Aa]ssets/AssetStore/*
 !/[Aa]ssets/AssetStore/**/*.meta 
 
+#Asset (special)
+/[Aa]ssets/Synty/*
+!/[Aa]ssets/Synty/**/*.meta 
+
 # Resources
 /[Aa]ssets/Resources/*
 !/[Aa]ssets/Resources/**/*.meta
