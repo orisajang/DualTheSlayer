@@ -11,6 +11,7 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
     [SerializeField] Image cardImage;
     [SerializeField] TextMeshProUGUI cardDescription;
     [SerializeField] TextMeshProUGUI cardCost;
+    [SerializeField] TextMeshProUGUI cardName;
 
     //MVP관련 설정
     CardPresenter cardPresenter;
@@ -33,11 +34,12 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
     }
 
     //낸 카드를 보여주기위해 카드정보를 수동으로 설정해야할때 사용
-    public void SetCardResourceForShowCard(Sprite sprite, string description, string cost)
+    public void SetCardResourceForShowCard(Sprite sprite, string description, string cost,string name)
     {
         cardImage.sprite = sprite;
         cardDescription.text = description;
         cardCost.text = cost;
+        cardName.text = name;
     }
     public eTargetType GetTargetType()
     {
@@ -49,6 +51,7 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
         cardImage.sprite = cardInstanceData.CardImage;
         cardDescription.text = cardInstanceData.Description;
         cardCost.text = cardInstanceData.Cost.ToString();
+        cardName.text = cardInstanceData.CardName;
     }
 
     //적이 들어오면 Presenter에 해당정보를 보내줘서 알아서 현재 카드를 실행하게 한다
@@ -95,7 +98,7 @@ public class CardView : MonoBehaviourPunCallbacks, ICardMVPView
     {
         //이제 RPC로 띄워야함, 다같이 화면에 있는 Prefab에 이미지, cost, 텍스트가 띄워진 상태로 보여야한다.
         Debug.Log("UpdateCardInfoUI 시작");
-        GameManager.Instance.inGameNetworkMgr.ShowUsedCard(cardInstanceData.CardImage.name, cardInstanceData.Description, cardInstanceData.Cost.ToString());
+        GameManager.Instance.inGameNetworkMgr.ShowUsedCard(cardInstanceData.CardImage.name, cardInstanceData.Description, cardInstanceData.Cost.ToString(), cardInstanceData.CardName);
     }
 }
 

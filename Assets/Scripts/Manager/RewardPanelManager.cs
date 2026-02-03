@@ -67,7 +67,7 @@ public class RewardPanelManager : MonoBehaviour
             CardRewardUI rewardUI = Instantiate(_cardRewardUI, this.gameObject.transform.position, Quaternion.identity,
                 this.gameObject.transform).GetComponent<CardRewardUI>();
             rewardUI.GetComponent<RectTransform>().anchoredPosition = cardSpawnPosition[spawnIndex].anchoredPosition;
-            rewardUI.SetCardRewadUI(cardSO.CardImage, cardSO.Description, cardSO.Cost.ToString(), selectIdList[spawnIndex]);
+            rewardUI.SetCardRewadUI(cardSO.CardImage, cardSO.Description, cardSO.Cost.ToString(), cardSO.CardName, selectIdList[spawnIndex]);
             rewardUI.OnClicked += ActiveSelecteCardOutline;
             _cardRewardUIList.Add(rewardUI);
         }

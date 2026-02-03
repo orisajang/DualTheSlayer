@@ -25,17 +25,17 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
         if (GameManager.isHaveInstance) GameManager.Instance.DeleteInGameNetworkManager(this);
     }
     [PunRPC]
-    private void ShowUsedCard_RPC(string imageName, string description, string cost)
+    private void ShowUsedCard_RPC(string imageName, string description, string cost, string name)
     {
         Debug.Log("ShowUsedCard_RPC RPC시작");
         CardView cardInfoView = CardInfoViewPrefab;
         Sprite imageNameToSprite = GameManager.Instance.assetManager.ImageSearchDic[imageName];
-        cardInfoView.SetCardResourceForShowCard(imageNameToSprite, description, cost);
+        cardInfoView.SetCardResourceForShowCard(imageNameToSprite, description, cost, name);
         ShowCardInfoUI();
     }
-    public void ShowUsedCard(string imageName, string description, string cost)
+    public void ShowUsedCard(string imageName, string description, string cost,string name)
     {
-        photonView.RPC(nameof(ShowUsedCard_RPC), RpcTarget.AllBuffered, imageName, description, cost);
+        photonView.RPC(nameof(ShowUsedCard_RPC), RpcTarget.AllBuffered, imageName, description, cost, name);
     }
     public void ShowCardInfoUI()
     {

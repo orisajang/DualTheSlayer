@@ -12,6 +12,7 @@ public class CardRewardUI : MonoBehaviour, IPointerDownHandler
     [SerializeField] Image _cardImage;
     [SerializeField] TextMeshProUGUI _cardDescription;
     [SerializeField] TextMeshProUGUI _costText;
+    [SerializeField] TextMeshProUGUI _cardName;
 
     //선택되었을때 해당 UI 주변에 붉은 테두리 표시를 위해서
     [SerializeField] Image _outLineImage;
@@ -22,12 +23,14 @@ public class CardRewardUI : MonoBehaviour, IPointerDownHandler
     //이벤트를 보낸다 (자기자신이 클릭되었다는)
     public event Action<CardRewardUI> OnClicked;
 
-    public void SetCardRewadUI(Sprite image, string description, string cost, string id)
+    public void SetCardRewadUI(Sprite image, string description, string cost, string name,string id)
     {
         _cardImage.sprite = image;
         _cardDescription.text = description;
         _costText.text = cost;
+        _cardName.text = name;
         CardId = id;
+
     }
     public void SetOutLineUI(bool isActive)
     {
