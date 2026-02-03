@@ -9,7 +9,7 @@ public class PlayerNameUI : MonoBehaviour
 
     public void SetPlayerName(string name, bool isMine)
     {
-        _playerNameText.text = name;
+        _playerNameText.text = "플레이어 " + name;
         //내꺼면 초록색으로 표시
         if(isMine)
         {
