@@ -63,6 +63,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     //각 상태이상별로 어떤 행동을 해야하는지 접근하기위해 전략패턴 + 딕셔너리 캐싱
     Dictionary<eConditionType, ConditionStrategy> _conditionStrategyDic = new Dictionary<eConditionType, ConditionStrategy>();
 
+    //플레이어의 캐릭터 모델프리팹이 생성되는 위치
+    [SerializeField] GameObject modelParent;
+
     //특정 상태이상(버프)가 적용되면 모든카드를 조건에 따라 카드설명 변경해야함
     public void UpdateAllCardDescription()
     {
@@ -138,6 +141,18 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         shield = 0;
 
         UpdateHpBar();
+    }
+    [PunRPC]
+    public void RPC_InitCharacterModel(int index)
+    {
+        //회전 설정
+        //0번째 위치일경우 왼쪽 -> 오른쪽을 바라보므로 90도, 1번째는 오른쪽 -> 왼쪽 바라보므로 180도 설정
+        if (index == 0) { modelParent.transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0)); }
+        else { modelParent.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0)); }
+        GameObject characterModelPrefab = GameManager.Instance.CharacterModelPrefabs[index];
+        Instantiate(characterModelPrefab, modelParent.transform);
+
+        
     }
     //게임매니저에 자기자신을 설정해서 접근할수있도록
     public override void OnEnable()

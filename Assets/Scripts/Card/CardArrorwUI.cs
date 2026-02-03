@@ -49,7 +49,7 @@ public class CardArrorwUI : MonoBehaviour
         {
             Debug.Log("앞에 물체가있다! 이름:" + hit.collider.name);
             Debug.Log("거리: " + hit.distance);
-            PlayerManager enemyPlayer = hit.transform.GetComponent<PlayerManager>();
+            PlayerManager enemyPlayer = hit.transform.GetComponentInParent<PlayerManager>();
 
             if(enemyPlayer != null)
             {

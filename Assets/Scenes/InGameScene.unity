@@ -1598,6 +1598,9 @@ MonoBehaviour:
   _cardPrefab: {fileID: 1730758409424322525, guid: 0c0de55f41acc51458184f9ed676a4ff, type: 3}
   _useCardLine: {fileID: 1223910166}
   _energyText: {fileID: 1124371837}
+  _characterModelPrefabs:
+  - {fileID: 8403695030359766227, guid: b2b9cfc69109063459776c5cb950a6a9, type: 3}
+  - {fileID: 7182723545819822547, guid: 3b9a845d230c57646bb9ebd9576a6d68, type: 3}
 --- !u!4 &1016278118
 Transform:
   m_ObjectHideFlags: 0
@@ -3318,7 +3321,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cfab7a497212e9c4da8da4833fe95271, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 81426d722f918644f8059f40c0f44084, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
