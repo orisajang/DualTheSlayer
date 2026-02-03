@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public enum eCardType
@@ -37,4 +38,21 @@ public class CardSO : ScriptableObject
     public string Description => description;
     public eTargetType TargetAble => targetAble;
     public List<CardExecuteSO> ExecuteSO => executeSO;
+
+    private void Awake()
+    {
+        //초기 카드설명 채우기
+        SetCardDescription();
+    }
+
+    //카드 초기 설명이 이제 CardExecute내용으로 인해 달라지므로 초기 설명 설정
+    public void SetCardDescription()
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach(CardExecuteSO cardSO in executeSO)
+        {
+            sb.Append(cardSO.CardInitDescription());
+        }
+        description = sb.ToString();
+    }
 }

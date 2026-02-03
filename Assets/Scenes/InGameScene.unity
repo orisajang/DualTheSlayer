@@ -1105,7 +1105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leaveRoomButton: {fileID: 147716712}
   _cardSpawnPositionParent: {fileID: 1431119313}
-  _cardRewardUI: {fileID: 7890269666657787446, guid: 1c02e77e512b97b4eab9053ed7b4e592, type: 3}
+  _cardRewardUI: {fileID: 8470942828035242075, guid: 12ba5c205a1923c42827b0bbd54996db, type: 3}
 --- !u!1 &928155133
 GameObject:
   m_ObjectHideFlags: 0
