@@ -105,11 +105,11 @@ public class MakeInitPlayerDeck:MonoBehaviour
         //예외처리
         if(saveInvenTask.Exception != null)
         {
-            Debug.Log($"인벤토리 에서 저장이 실패했습니다 {saveInvenTask.Exception}");
+            //Debug.Log($"인벤토리 에서 저장이 실패했습니다 {saveInvenTask.Exception}");
         }
         if(saveDeckTask.Exception != null)
         {
-            Debug.Log($"덱 에서 저장이 실패했습니다 {saveDeckTask.Exception}");
+            //Debug.Log($"덱 에서 저장이 실패했습니다 {saveDeckTask.Exception}");
         }
     }
 
@@ -147,7 +147,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
         }
         Task task = deckRef.SetValueAsync(cardIdList);
         //yield return new WaitUntil(() => task.IsCompleted);
-        Debug.Log("초기덱 저장완료");
+        //Debug.Log("초기덱 저장완료");
         await task;
     }
 
@@ -175,7 +175,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
 
         if (deckTask.Exception != null || invenTask.Exception != null) //에러가 발생했다면
         {
-            Debug.LogWarning($"데이터 불러오기 실패 {deckTask.Exception} / {invenTask.Exception}");
+            //Debug.LogWarning($"데이터 불러오기 실패 {deckTask.Exception} / {invenTask.Exception}");
         }
         else
         {
@@ -186,14 +186,14 @@ public class MakeInitPlayerDeck:MonoBehaviour
                 //초기 덱을 설정해주자 (코루틴안에서 코루틴을 실행해야할때는 async await을 쓴다)
                 Task saveTask = MakeAndSaveInitPlayerDeck();
                 //다시 불러온다
-                Debug.Log("초기덱 저장완료2");
+                //Debug.Log("초기덱 저장완료2");
                 //yield return new WaitUntil(() => saveTask.IsCompleted);
                 await saveTask;
                 deckTask = deckRef.GetValueAsync();
                 //yield return new WaitUntil(() => deckTask.IsCompleted);
                 await deckTask;
             }
-            Debug.Log("초기덱 저장완료3");
+            //Debug.Log("초기덱 저장완료3");
             currentPlayerDeck.Clear();
             deckSettingPanel.SetActive(true);
             //플레이어 덱 리스트 DB에서 가져오기

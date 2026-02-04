@@ -22,7 +22,7 @@ public class CardExecuteDefenseSO : CardExecuteSO
     {
         //공통 기능 사용(카드 풀에 반환)
         base.Execute(info);
-        Debug.Log("Defense");
+        //Debug.Log("Defense");
         info.UseCardPlayer.AddPlayerShield(amount, info.cardInstanceData.Cost);
         
     }

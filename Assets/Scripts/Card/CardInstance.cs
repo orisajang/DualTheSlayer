@@ -68,7 +68,7 @@ public class CardInstance
             isAllSuccess = cardExecuteSO.CanExecute(cardTargetInfoClass);
             if (isAllSuccess == false)
             {
-                Debug.LogWarning($"카드 행동중에서 실행하지 못하는 행동이 있어 취소합니다");
+                //Debug.LogWarning($"카드 행동중에서 실행하지 못하는 행동이 있어 취소합니다");
                 return false; //실행불가면 바로 false return
             }
         }
@@ -79,7 +79,7 @@ public class CardInstance
             cardExecuteSO.Execute(cardTargetInfoClass);
         }
         //전부 실행완료한다음에 해야할 작업들이 있는지 체크 (자기자신에게 카드 낸다음에 부여되는 효과들이 있는지)
-        Debug.Log("카드 행동들 실행완료. 카드낸후에 해야할것들있는지 확인합니다");
+        //Debug.Log("카드 행동들 실행완료. 카드낸후에 해야할것들있는지 확인합니다");
         cardTargetInfoClass.UseCardPlayer.AfterUseCardBehavior(cardTargetInfoClass.cardInstanceData.Cost);
 
         return true;  //실행다했으면 true보냄 

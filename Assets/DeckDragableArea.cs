@@ -23,7 +23,7 @@ public class DeckDragableArea : MonoBehaviour,
 
         //이제 부모가 서로 다른지 확인해서 경우2가지로 해결해야함
         DeckDragableArea parent = prefab.OriginParent.GetComponentInParent<DeckDragableArea>();
-        Debug.Log($"부모는: {parent.name}");
+        //Debug.Log($"부모는: {parent.name}");
         if (gameObject.transform.parent == parent) return;
         //이제 어디에서 바꿨는지 확인해서 처리
         if(parent.DropzoneType == eDropzoneType.deck && DropzoneType == eDropzoneType.inventory)
@@ -50,11 +50,11 @@ public class DeckDragableArea : MonoBehaviour,
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("Enter");
+        //Debug.Log("Enter");
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("Exit");
+        //Debug.Log("Exit");
     }
 }

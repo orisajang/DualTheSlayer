@@ -47,13 +47,13 @@ public class CardArrorwUI : MonoBehaviour
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit,100f,_layer))
         {
-            Debug.Log("앞에 물체가있다! 이름:" + hit.collider.name);
-            Debug.Log("거리: " + hit.distance);
+            //Debug.Log("앞에 물체가있다! 이름:" + hit.collider.name);
+            //Debug.Log("거리: " + hit.distance);
             PlayerManager enemyPlayer = hit.transform.GetComponentInParent<PlayerManager>();
 
             if(enemyPlayer != null)
             {
-                Debug.Log("준비 완료");
+                //Debug.Log("준비 완료");
                 //현재 들어있는 카드의 정보를 가지고와서. 그 카드를 hit.transform에 실행해주자
                 cardView.ExecuteCommand(enemyPlayer);
 

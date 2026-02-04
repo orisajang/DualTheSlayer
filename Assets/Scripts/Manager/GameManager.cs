@@ -140,7 +140,7 @@ public class GameManager : Singleton<GameManager>
             playerManager.photonView.RPC(nameof(playerManager.RPC_InitCharacterModel), RpcTarget.AllBuffered, spawnIndex);
 
             int Num = GameManager.Instance.playerManager.PlayerID;
-            Debug.Log($"{Num}");
+            //Debug.Log($"{Num}");
         }
     }
     //실제 플레이어가 몇명인지 확인 (플레이어가 모두 설정될때까지 대기하기 위해서)
@@ -188,11 +188,11 @@ public class GameManager : Singleton<GameManager>
         yield return new WaitUntil(() => DBTask.IsCompleted);
         if (DBTask.Exception != null) //에러가 발생했다면
         {
-            Debug.LogWarning($"데이터 불러오기 실패 {DBTask.Exception}");
+            //Debug.LogWarning($"데이터 불러오기 실패 {DBTask.Exception}");
         }
         else if (DBTask.Result.Value == null) //데이터없는 사람도 체크 (한번도 저장안한사람)
         {
-            Debug.LogWarning("저장된 데이터가 없습니다");
+            //Debug.LogWarning("저장된 데이터가 없습니다");
             //새로 만들어주자
             PlayerLevelData playerData = new PlayerLevelData();
             string newJson = JsonUtility.ToJson(playerData);
@@ -200,7 +200,7 @@ public class GameManager : Singleton<GameManager>
             yield return new WaitUntil(() => saveTask.IsCompleted);
             if(saveTask.Exception != null)
             {
-                Debug.LogWarning($"플레이어 데이터 저장 실패 {saveTask.Exception}");
+                //Debug.LogWarning($"플레이어 데이터 저장 실패 {saveTask.Exception}");
             }
             //새로 만들어준 데이터로 플레이어 정보 설정
             playerLevelData = playerData;
@@ -210,19 +210,19 @@ public class GameManager : Singleton<GameManager>
         {
             DataSnapshot snapshot = DBTask.Result;
             string json = snapshot.GetRawJsonValue();
-            Debug.Log($"Load json 데이터: {json}");
+            //Debug.Log($"Load json 데이터: {json}");
             playerLevelData = JsonUtility.FromJson<PlayerLevelData>(json);
-            Debug.Log("플레이어 데이터 저장완료");
+            //Debug.Log("플레이어 데이터 저장완료");
         }
     }
 
     //플레이어 데이터 저장. 불러오기는 코루틴써봤고, 저장은 async 써봤음. async는 한프레임내에서 끝나면 바로 시작한다고함.
     public async Task SavePlayerData(int expAddValue)
     {
-        Debug.Log($"플레이어 경험치를 증가시키겠습니다 {expAddValue}");
+        //Debug.Log($"플레이어 경험치를 증가시키겠습니다 {expAddValue}");
         //플레이어 경험치량을 통해 레벨업 계산
         playerLevelData.AddExpAndCheckLevelUp(expAddValue);
-        Debug.Log($"저장전{FirebaseAuth.DefaultInstance.CurrentUser}의 플레이어 레벨: {playerLevelData.Level} 경험처: {playerLevelData.Exp} 저장됨 ");
+        //Debug.Log($"저장전{FirebaseAuth.DefaultInstance.CurrentUser}의 플레이어 레벨: {playerLevelData.Level} 경험처: {playerLevelData.Exp} 저장됨 ");
         //DB에 결과값 저장
         string json = JsonUtility.ToJson(playerLevelData);
         DatabaseReference playerDataRef = NetworkEventManager.Instance.GetPlayerRef();
@@ -230,11 +230,11 @@ public class GameManager : Singleton<GameManager>
         try
         {
             await playerDataRef.SetRawJsonValueAsync(json);
-            Debug.Log($"저장후{FirebaseAuth.DefaultInstance.CurrentUser}의 플레이어 레벨: {playerLevelData.Level} 경험처: {playerLevelData.Exp} 저장됨 ");
+            //Debug.Log($"저장후{FirebaseAuth.DefaultInstance.CurrentUser}의 플레이어 레벨: {playerLevelData.Level} 경험처: {playerLevelData.Exp} 저장됨 ");
         }
         catch(Exception ex)
         {
-            Debug.Log($"저장에 예외발생 {ex}");
+            //Debug.Log($"저장에 예외발생 {ex}");
         }
  
     }
@@ -247,11 +247,11 @@ public class GameManager : Singleton<GameManager>
 
         if (DBTask.Exception != null) //에러가 발생했다면
         {
-            Debug.LogWarning($"데이터 불러오기 실패 {DBTask.Exception}");
+            //Debug.LogWarning($"데이터 불러오기 실패 {DBTask.Exception}");
         }
         else if (DBTask.Result.Value == null) //데이터없는 사람도 체크 (한번도 저장안한사람)
         {
-            Debug.LogWarning("저장된 데이터가 없습니다");
+            //Debug.LogWarning("저장된 데이터가 없습니다");
         }
         else
         {
@@ -264,7 +264,7 @@ public class GameManager : Singleton<GameManager>
                 deckCardList.Add(currentCard);
                 //만약 부하를 여러 프레임에 분산시키려면 yield로 할수도있지만, 작업도중 Save가 되면 이상해질수있음. DB는 무결성이 중요하기때문에 안하는게 좋음
             }
-            Debug.Log("DB에서 덱 데이터 Load 완료");
+            //Debug.Log("DB에서 덱 데이터 Load 완료");
         }
 
     }
@@ -317,7 +317,7 @@ public class GameManager : Singleton<GameManager>
         if(!_playerInstanceDic.ContainsKey(actorID))
         {
             _playerInstanceDic[actorID] = playerMgr;
-            Debug.Log($"{actorID}등록되었습니다");
+            //Debug.Log($"{actorID}등록되었습니다");
         }
         //플레이어가 사망했을때 이벤트가 등록되어야 하므로 추가
         playerMgr.OnPlayerDead += inGameNetworkMgr.PlayerDeadNotified;

@@ -108,7 +108,7 @@ public class CardInputController : MonoBehaviour,
     {
         //현재 플레이어의 행동력이 카드의 코스트보다 많고 && 플레이어 자신의 턴일때만 카드 드래그 가능
         bool isDragable = cardView.IsUseableCard() && GameManager.Instance.turnManager.IsMyTurn(GameManager.Instance.playerManager.PlayerID);
-        Debug.Log($"카드드래깅 가능여부: {isDragable}");
+        //Debug.Log($"카드드래깅 가능여부: {isDragable}");
         return isDragable;
     }
 }

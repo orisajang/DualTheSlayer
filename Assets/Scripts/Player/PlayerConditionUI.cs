@@ -54,7 +54,7 @@ public class PlayerConditionUI : MonoBehaviour
     {
         if(buffType != _buffType)
         {
-            Debug.LogError($"버프 타입이 다릅니다 뭔가 에러");
+            //Debug.LogError($"버프 타입이 다릅니다 뭔가 에러");
             return;
         }
         _amount += buffAmount;
@@ -79,7 +79,7 @@ public class PlayerConditionUI : MonoBehaviour
         UpdateUIElement();
         if (_duration <= 0)
         {
-            Debug.Log($"{_buffType.ToString()}의 버프가 끝났습니다");
+            //Debug.Log($"{_buffType.ToString()}의 버프가 끝났습니다");
             //Destroy(gameObject);
             _buffSpawner.ReturnPlayerBuffUIToPool(this);
             return true;

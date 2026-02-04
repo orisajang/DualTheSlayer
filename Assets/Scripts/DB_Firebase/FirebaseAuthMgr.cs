@@ -39,7 +39,7 @@ public class FirebaseAuthMgr : MonoBehaviour
             }
             else
             {
-                UnityEngine.Debug.LogError(System.String.Format("뭔가 잘못됨" + task.Result));
+                //UnityEngine.Debug.LogError(System.String.Format("뭔가 잘못됨" + task.Result));
             }
         });
         //버튼 등록
@@ -77,7 +77,7 @@ public class FirebaseAuthMgr : MonoBehaviour
         //로그인 시도가 완료되었다면 진행
         if (LoginTask.Exception != null) //로그인 문제가 생겼다면
         {
-            Debug.Log("다음과 같은 이유로 로그인 실패: " + LoginTask.Exception);
+            //Debug.Log("다음과 같은 이유로 로그인 실패: " + LoginTask.Exception);
             FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
             AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
             string message = "";
@@ -120,7 +120,7 @@ public class FirebaseAuthMgr : MonoBehaviour
         yield return new WaitUntil(() => RegisterTask.IsCompleted);
         if (RegisterTask.Exception != null)
         {
-            Debug.LogWarning(message: "실패 사유" + RegisterTask.Exception);
+            //Debug.LogWarning(message: "실패 사유" + RegisterTask.Exception);
             FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
             AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
 
@@ -158,7 +158,7 @@ public class FirebaseAuthMgr : MonoBehaviour
 
                 if (profileTask.Exception != null) //문제가 생겼다면
                 {
-                    Debug.LogWarning("닉네임설정 실패" + profileTask.Exception);
+                    //Debug.LogWarning("닉네임설정 실패" + profileTask.Exception);
                     FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
                     AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
                     _warningText.text = "닉네임 설정 실패하였습니다";

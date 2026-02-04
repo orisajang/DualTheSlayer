@@ -78,6 +78,6 @@ public class NetworkEventManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        Debug.Log("완료");
+        //Debug.Log("완료");
     }
 }

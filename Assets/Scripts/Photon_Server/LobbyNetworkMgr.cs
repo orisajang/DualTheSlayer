@@ -73,14 +73,14 @@ public class LobbyNetworkMgr : MonoBehaviourPunCallbacks
     //방 입장 실패
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        Debug.Log(returnCode + " " + message); //혹은 팝업 띄울수있다
+        //Debug.Log(returnCode + " " + message); //혹은 팝업 띄울수있다
         _failScript.Init($"입장실패. {returnCode} {message}");
         errorPanel.SetActive(true);
         //PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 4 }); //실패했다면 방 생성한다
     }
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log($"랜덤방 입장 실패");
+        //Debug.Log($"랜덤방 입장 실패");
         _failScript.Init("입장할 수 있는 방이 없습니다. 새로 생성해주세요");
         errorPanel.SetActive(true);
         
@@ -88,9 +88,9 @@ public class LobbyNetworkMgr : MonoBehaviourPunCallbacks
     //방 입장 성공
     public override void OnJoinedRoom()
     {
-        Debug.Log("룸으로 이동합니다");
+        //Debug.Log("룸으로 이동합니다");
         Room room = PhotonNetwork.CurrentRoom;
-        Debug.Log($"{room.Name} 방에 {PhotonNetwork.NickName}님이 입장함"); //방이름, 닉네임
+        //Debug.Log($"{room.Name} 방에 {PhotonNetwork.NickName}님이 입장함"); //방이름, 닉네임
         //(추가필요) 이후에 원한다면 커스텀 프로퍼티로 플레이어의 HP값들을 설정해야함 (늦게 들어온 사람도 HP값이 몇인지 받을수있도록) -> 인게임에서 하는건가?
         SceneManager.LoadScene(2);
     }
@@ -100,7 +100,7 @@ public class LobbyNetworkMgr : MonoBehaviourPunCallbacks
     }
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        Debug.Log("룸리스트 업데이트");
+        //Debug.Log("룸리스트 업데이트");
         //방 정보가 업데이트 되거나, JoinLobby성공시 한번
         foreach (RoomInfo roomInfo in roomList)
         {

@@ -62,9 +62,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
     private IEnumerator InitPlayerTurnSetting()
     {
         //bool isPlayerMakeComplete = GameManager.Instance.IsPlayerInstantiateComplete();
-        Debug.Log("대기 시작");
+        //Debug.Log("대기 시작");
         yield return new WaitUntil(GameManager.Instance.IsPlayerInstantiateComplete);
-        Debug.Log("대기 종료");
+        //Debug.Log("대기 종료");
         foreach (Player ply in PhotonNetwork.PlayerList)
         {
             if (ply.ActorNumber == CurrentPlayerId)
@@ -77,7 +77,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
                 //현재 턴인 플레이어를 위해 초기값 설정
                 CurrentTurnPlayer = GameManager.Instance.PlayerInstanceDic[ply.ActorNumber];
                 CurrentTurnPlayer.SetPlyerTurnInit(_energyText);
-                Debug.Log($"현재턴 플레이어번호:{ply.ActorNumber} 내번호: {PhotonNetwork.LocalPlayer.ActorNumber}");
+                //Debug.Log($"현재턴 플레이어번호:{ply.ActorNumber} 내번호: {PhotonNetwork.LocalPlayer.ActorNumber}");
                 if (ply.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
                 {
                     _endTurnButton.gameObject.SetActive(true);

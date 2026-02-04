@@ -111,7 +111,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
             StringBuilder sb = new StringBuilder();
             foreach(CardExecuteSO executeSO in card.ExecuteSOList)
             {
-                Debug.Log("돌아가면서 힘을 체크합니다");
+                //Debug.Log("돌아가면서 힘을 체크합니다");
                 //바뀐 카드 정보들을 sb에 담음
                 sb.Append(executeSO.CardSetDescription(plyPower));
             }
@@ -149,7 +149,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         {
             DrawPlayerCard();
         }
-        Debug.Log(playerHand.Count);
+        //Debug.Log(playerHand.Count);
         
     }
     [PunRPC]
@@ -272,7 +272,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         if (_energyTextUI == null)
         {
-            Debug.Log("텍스트가 null");
+            //Debug.Log("텍스트가 null");
             return;
         }
         
@@ -284,7 +284,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         //손패에서 제거
         playerHand.Remove(usedCard);
-        Debug.Log($"플레이어의 손패갯수:{playerHand.Count}");
+        //Debug.Log($"플레이어의 손패갯수:{playerHand.Count}");
     }
     //카드를 낸 다음에 발동되어야 할 것들 모아둠.
     public void AfterUseCardBehavior(int cardCost)
@@ -299,7 +299,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     //버프가 없다면 만들어주고, 아니면 횟수를 추가해준다
     public void CreateOrAddBuffStatus(eConditionType buffType, int amount, int duration, bool isStackAble)
     {
-        Debug.Log("전략패턴 시작");
+        //Debug.Log("전략패턴 시작");
         //전략패턴이 없을때만 새로 할당해주고 그 이후로는 계속 하나로 사용
         switch (buffType)
         {
@@ -353,7 +353,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void TakeDamageRPC(int amount, int attackerActorID)
     {
-        Debug.Log("TakeDamageRPC");
+        //Debug.Log("TakeDamageRPC");
         CalcDamage(amount);
         UpdateHpBar();
         //HP 0이되었는지확인
@@ -381,7 +381,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         //자기자신턴인 플레이어가 직접 RPC로 값들을 보내준다
         if(photonView.IsMine)
         {
-            Debug.Log($"{photonView.Owner.ActorNumber}가 {amount}만큼 힐을 합니다");
+            //Debug.Log($"{photonView.Owner.ActorNumber}가 {amount}만큼 힐을 합니다");
             photonView.RPC(nameof(HealingPlayerSelfRPC), RpcTarget.All, amount);
         }
     }
@@ -412,10 +412,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void DecreaseEnergyRPC(int cardCost)
     {
-        Debug.Log($"감소전 행동력 {currentEnergy} 비용 {cardCost}");
+        //Debug.Log($"감소전 행동력 {currentEnergy} 비용 {cardCost}");
         currentEnergy -= cardCost;
         SetEnergyText(currentEnergy);
-        Debug.Log($"{photonView.Owner.ActorNumber} 행동력: {currentEnergy}");
+        //Debug.Log($"{photonView.Owner.ActorNumber} 행동력: {currentEnergy}");
     }
     [PunRPC]
     private void InitEnergyRPC(int energy)

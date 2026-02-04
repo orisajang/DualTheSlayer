@@ -14,7 +14,7 @@ public class CardExecuteAttackSO : CardExecuteSO
     {
         if (cardTargetInfoClass.TargetPlayer == GameManager.Instance.playerManager)
         {
-            Debug.Log("자기 자신을 공격할수 없습니다");
+            //Debug.Log("자기 자신을 공격할수 없습니다");
             return false;
         }
         return true;
@@ -35,12 +35,12 @@ public class CardExecuteAttackSO : CardExecuteSO
     {
         //공통 기능 사용(카드 풀에 반환)
         base.Execute(cardTargetInfoClass);
-        Debug.Log("공격 명령");
+        //Debug.Log("공격 명령");
         //자신의 힘(Power)수치를 더해서 공격력에 추가시켜주면 될듯? 일단은 카드수치만 적용
 
         //상대에게 데미지 처리
         int addValue = cardTargetInfoClass.UseCardPlayer.PlayerCondition.GetPlayerPower();
-        Debug.Log($"힘으로 인해 {addValue} 숫자가 더해졌습니다");
+        //Debug.Log($"힘으로 인해 {addValue} 숫자가 더해졌습니다");
         //실제 데미지 처리하는 메서드로 이동
         cardTargetInfoClass.TargetPlayer.TakeDamage(amount + addValue, cardTargetInfoClass.UseCardPlayer.photonView.Owner.ActorNumber);
         //소리 재생

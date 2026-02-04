@@ -16,7 +16,7 @@ public class CardExecuteBleedingSO : CardExecuteSO
         //카드 사용가능한지 조건체크
         if(cardTargetInfoClass.TargetPlayer == cardTargetInfoClass.UseCardPlayer)
         {
-            Debug.Log($"자기자신이 카드사용 대상이 될수없습니다");
+            //Debug.Log($"자기자신이 카드사용 대상이 될수없습니다");
             return false;
         }
         return true;

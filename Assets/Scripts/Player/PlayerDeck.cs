@@ -35,7 +35,7 @@ public class PlayerDeck : MonoBehaviour
         //하나씩 return 해준다
         if(currentCardList.Count <= 0)
         {
-            Debug.LogError("에러발생. 카드를 줄수없습니다"); 
+            //Debug.LogError("에러발생. 카드를 줄수없습니다"); 
         }
         return currentCardList[currentIndex++];
         

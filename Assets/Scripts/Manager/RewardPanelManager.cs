@@ -35,12 +35,12 @@ public class RewardPanelManager : MonoBehaviour
 
     public void SetAndStartRewardProgress(int cardCount)
     {
-        Debug.Log("SetAndStartRewardProgress 진입");
+        //Debug.Log("SetAndStartRewardProgress 진입");
         cardSpawnPosition = _cardSpawnPositionParent.GetComponentsInChildren<RectTransform>().Where(a => a.gameObject != _cardSpawnPositionParent).ToList();
         //cardCount => 몇장의 카드가 등장해야하는지
         if (cardCount > cardSpawnPosition.Count) 
         {
-            Debug.LogError($"표시할수있는 카드는 {cardSpawnPosition.Count}개 입니다 {cardCount}개를 표시하려고해서 에러!");
+            //Debug.LogError($"표시할수있는 카드는 {cardSpawnPosition.Count}개 입니다 {cardCount}개를 표시하려고해서 에러!");
         }
 
         //카드딕셔너리에 대한 정보를 받아서 처리하거나? 혹은

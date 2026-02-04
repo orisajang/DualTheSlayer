@@ -63,17 +63,17 @@ public class PlayerCondition :MonoBehaviour
     [PunRPC]
     private void CheckBleedingStatusRPC()
     {
-        Debug.Log($"실행자 ID: {_pv.Owner.ActorNumber} 출혈량 {_conditionTypeDic[eConditionType.Bleeding].Amount}, 횟수 {_conditionTypeDic[eConditionType.Bleeding].Duration}");
+        //Debug.Log($"실행자 ID: {_pv.Owner.ActorNumber} 출혈량 {_conditionTypeDic[eConditionType.Bleeding].Amount}, 횟수 {_conditionTypeDic[eConditionType.Bleeding].Duration}");
         if (_conditionTypeDic[eConditionType.Bleeding].Duration > 0)
         {
             //예외처리: 만약 출혈 부여자의 ID가 없는경우라면 이상함. 에러발생
             if (BleedApplierId == INVALID_BLEED_APPLIER_ID)
             {
-                Debug.LogError("출혈 보유자의 ID가 없습니다. 에러발생");
+                //Debug.LogError("출혈 보유자의 ID가 없습니다. 에러발생");
                 return;
             }
             //bleedingDuration -= 1;
-            Debug.Log($"출혈 발동!! 데미지: {_conditionTypeDic[eConditionType.Bleeding].Amount} 남은출혈횟수: {_conditionTypeDic[eConditionType.Bleeding].Duration - 1}");
+            //Debug.Log($"출혈 발동!! 데미지: {_conditionTypeDic[eConditionType.Bleeding].Amount} 남은출혈횟수: {_conditionTypeDic[eConditionType.Bleeding].Duration - 1}");
             //자기자신만 TakeDamage를 보내줌(1번만 보내야하므로)
             //소리 발동
             SoundManager.Instance.PlayEffectSound(_playerManager.AudioSource,_playerManager.BleedClip);
@@ -123,7 +123,7 @@ public class PlayerCondition :MonoBehaviour
         }
         if(_conditionTypeDic[eConditionType.Power].Duration ==0)
         {
-            Debug.LogError("Power횟수가 0임. 여기 오면 안되는데 뭔가 에러");
+            //Debug.LogError("Power횟수가 0임. 여기 오면 안되는데 뭔가 에러");
             return 0;
         }
         //정상적이라면 바로 플레이어의 현재 힘을 보내준다
@@ -134,7 +134,7 @@ public class PlayerCondition :MonoBehaviour
     public void AddConditionStatus(eConditionType conditionType, int amount, int duration, int applierActorNumber)
     {
         //RPC로 보내주기위한 일반 메서드 사용
-        Debug.Log($"상태이상추가! 타입:{conditionType} 시작전 부여자: {applierActorNumber}, 피격자: {_pv.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
+        //Debug.Log($"상태이상추가! 타입:{conditionType} 시작전 부여자: {applierActorNumber}, 피격자: {_pv.Owner.ActorNumber} 출혈량 {amount}, 횟수 {duration}");
         //지속시간 쌓일수있는 버프 유형인지 체크
         bool isStackAble = _conditionDurationStackableDic[conditionType];
 

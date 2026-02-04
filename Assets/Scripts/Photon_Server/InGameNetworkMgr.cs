@@ -27,7 +27,7 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
     [PunRPC]
     private void ShowUsedCard_RPC(string imageName, string description, string cost, string name)
     {
-        Debug.Log("ShowUsedCard_RPC RPC시작");
+        //Debug.Log("ShowUsedCard_RPC RPC시작");
         CardView cardInfoView = CardInfoViewPrefab;
         Sprite imageNameToSprite = GameManager.Instance.assetManager.ImageSearchDic[imageName];
         cardInfoView.SetCardResourceForShowCard(imageNameToSprite, description, cost, name);
@@ -57,7 +57,7 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
     //플레이어가 죽으면 마스터 클라이언트에게 자신과 죽인사람의 ID를 보냄
     public void PlayerDeadNotified(int actorNumber,int attackerActorID)
     {
-        Debug.Log("PlayerDeadNotified호출됨");
+        //Debug.Log("PlayerDeadNotified호출됨");
         photonView.RPC(nameof(PlayerDead_RPC), RpcTarget.MasterClient, actorNumber, attackerActorID);
     }
     //플레이어 사망했으니까 게임결과에 따라 exp를 서로 올려줌
@@ -67,7 +67,7 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
         //마스터클라이언트가 아니면 return
         if (!PhotonNetwork.IsMasterClient) return;
 
-        Debug.Log("마스터클라이언트에서 죽은사람과 승리자에게 RPC를 보내려고함");
+        //Debug.Log("마스터클라이언트에서 죽은사람과 승리자에게 RPC를 보내려고함");
         //플레이어가 죽었다. 이 사실을 마스터 클라이언트에게만 RPC로 보낸다.
         //죽은사람은 exp 50증가, 이긴사람은 exp 100증가시키면 된다. 
         int defeatPlayerAddExp = 50;
@@ -77,12 +77,12 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
             //만약 죽은사람이었다면 (패배한사람)
             if(ply.ActorNumber == deadPlayerActorNumber)
             {
-                Debug.Log("마스터클라이언트에서 죽은사람에게 RPC를 보냄");
+                //Debug.Log("마스터클라이언트에서 죽은사람에게 RPC를 보냄");
                 photonView.RPC(nameof(AddExpValue), ply, defeatPlayerAddExp);
             }
             else if( ply.ActorNumber == attackerActorID) //만약 공격자였다면 (승리한사람)
             {
-                Debug.Log("마스터클라이언트에서 이긴사람에게 RPC를 보냄");
+                //Debug.Log("마스터클라이언트에서 이긴사람에게 RPC를 보냄");
                 photonView.RPC(nameof(AddExpValue), ply, victoryPlayerAddExp);
             }
         }
@@ -93,13 +93,13 @@ public class InGameNetworkMgr : MonoBehaviourPunCallbacks
     [PunRPC]
     public void AddExpValue(int addExpValue)
     {
-        Debug.Log($"마스터클라이언트에서 RPC를 받았습니다 {addExpValue}");
+        //Debug.Log($"마스터클라이언트에서 RPC를 받았습니다 {addExpValue}");
         GameManager.Instance.SavePlayerData(addExpValue);
     }
     [PunRPC]
     public void ShowGameResultPanel_RPC(int deadPlayerActorNumber, int attackerActorID, int defeatPlayerAddExp, int victoryPlayerAddExp)
     {
-        Debug.Log("결과패널 열기 시작");
+        //Debug.Log("결과패널 열기 시작");
         //설정 안되어있으면 관전자라는 의미이므로 
         string gameResult = "";
         if(PhotonNetwork.LocalPlayer.ActorNumber == deadPlayerActorNumber) //패배한사람

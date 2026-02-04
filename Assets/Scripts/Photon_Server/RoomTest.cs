@@ -70,7 +70,7 @@ public class RoomTest
         if (seatIndex == -1) return;
         else
         {
-            Debug.Log(seatIndex + "번째 플레이어 자리에 채워질것입니다");
+            //Debug.Log(seatIndex + "번째 플레이어 자리에 채워질것입니다");
             //기존에 앉아있었다면 자리 지워줌(딕셔너리)
             if(seatDic.ContainsKey(dbID))
             {
@@ -91,7 +91,7 @@ public class RoomTest
         if (seatIndex == -1) return;
         else
         {
-            Debug.Log(seatIndex + "번째 관전자 자리에 채워질것입니다");
+            //Debug.Log(seatIndex + "번째 관전자 자리에 채워질것입니다");
             if (seatDic.ContainsKey(dbID))
             {
                 seatDic[dbID].InitInfo();

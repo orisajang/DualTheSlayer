@@ -81,15 +81,15 @@ public class RoomNetworkMgr : MonoBehaviourPunCallbacks
     }
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Debug.Log($"{newPlayer.NickName}님이 입장했습니다");
+        //Debug.Log($"{newPlayer.NickName}님이 입장했습니다");
     }
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        Debug.Log($"{otherPlayer.NickName}님이 나갔습니다");
+        //Debug.Log($"{otherPlayer.NickName}님이 나갔습니다");
     }
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
-        Debug.Log($"{newMasterClient.NickName}님이 방장이 되었습니다");
+        //Debug.Log($"{newMasterClient.NickName}님이 방장이 되었습니다");
         //방장이 할 행동을 해야함. (시작버튼 활성화 등)
     }
 

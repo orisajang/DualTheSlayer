@@ -45,7 +45,7 @@ public class TitleMgr : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         //플레이어가 뭔가 다같이 이동할 필요가 없으므로 그냥 씬만 이동시켜준다
-        Debug.Log("접속 성공!!");
+        //Debug.Log("접속 성공!!");
         SceneManager.LoadScene(1);
     }
 
