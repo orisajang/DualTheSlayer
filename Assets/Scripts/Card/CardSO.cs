@@ -1,0 +1,58 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+
+public enum eCardType
+{
+    Attack, Defense, Special
+}
+public enum eTargetType
+{
+    Target, NotTarget
+}
+//(SO를 만든뒤 Resource/CardData폴더에 넣어둬야함)
+[CreateAssetMenu(menuName = "SO/Card/Card Data", fileName = "CardData")]
+public class CardSO : ScriptableObject
+{
+    //유니티에서 제공하는 ScriptableObject를 이용해서 Inspector에서 Stage정보를 설정할 수 있도록 설정
+    [SerializeField] private string cardId; //카드 고유 ID
+    [SerializeField] private string cardName; //카드 이름
+    [SerializeField] private int cost; //카드 비용
+    
+    [SerializeField] private Sprite cardImage;//카드 이미지
+    [SerializeField] private eTargetType targetAble; //타게팅 가능한 스킬인지
+    //실행되면 무엇을 해야하는지
+    [SerializeField] List<CardExecuteSO> executeSO;
+
+    //카드 설명은 카드 행동들에 의해 달라져야하므로 설정 못함
+    private string description; //카드 설명
+    //private eCardType cardType; //카드 타입 (필요없음)
+
+    //읽기전용 프로퍼티들
+    public string CardId => cardId;
+    public string CardName => cardName;
+    public int Cost => cost;
+    //public eCardType CardType => cardType;
+    public Sprite CardImage => cardImage;
+    public string Description => description;
+    public eTargetType TargetAble => targetAble;
+    public List<CardExecuteSO> ExecuteSO => executeSO;
+
+    private void Awake()
+    {
+        //초기 카드설명 채우기
+        SetCardDescription();
+    }
+
+    //카드 초기 설명이 이제 CardExecute내용으로 인해 달라지므로 초기 설명 설정
+    public void SetCardDescription()
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach(CardExecuteSO cardSO in executeSO)
+        {
+            sb.Append(cardSO.CardInitDescription());
+        }
+        description = sb.ToString();
+    }
+}
