@@ -27,6 +27,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
     [SerializeField] Button saveButton;
     [SerializeField] GameObject inventoryScrollviewContent;
     [SerializeField] GameObject deckScrollviewContent;
+    WaitForSeconds _delay;
 
     private void Awake()
     {
@@ -34,16 +35,25 @@ public class MakeInitPlayerDeck:MonoBehaviour
         //deckRef = dbRef.Child("users").Child(user.UserId).Child("deck");
         invenRef = NetworkEventManager.Instance.GetInvenRef();
         deckRef = NetworkEventManager.Instance.GetDeckRef();
+        _delay = new WaitForSeconds(2.0f);
     }
 
     private void OnEnable()
     {
         closeButton.onClick.AddListener(CloseButtonClick);
         saveButton.onClick.AddListener(()=> SaveDeckAndInventory());
+        //초기에 덱 정보 가져와야 하므로 넣어줌
+        StartCoroutine(LoadMyDeckDataCor());
     }
     private void OnDisable()
     {
         closeButton.onClick.RemoveAllListeners();
+    }
+
+    IEnumerator LoadMyDeckDataCor()
+    {
+        yield return _delay;
+        OpenMyDeck(false);
     }
 
     private void CloseButtonClick()
@@ -123,7 +133,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
         return cardInfoDic[id];
     }
 
-    public async void OpenMyDeck()
+    public async void OpenMyDeck(bool openPanel = true)
     {
         //카드 데이터들을 설정
         //처음 덱설정 페이지를 여는것이었다면 카드별 정보를 딕셔너리에 캐싱해줌
@@ -132,7 +142,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
             InitCardData();
         }
         //유저가 가지고있는 덱 정보를 불러온다
-        await LoadUserData();
+        await LoadUserData(openPanel);
     }
     public async Task MakeAndSaveInitPlayerDeck()
     {
@@ -165,7 +175,7 @@ public class MakeInitPlayerDeck:MonoBehaviour
     }
 
     //읽기방법. 데이터를 읽는다 (코루틴으로 불러오고 성공여부 파악. 하위에 있는 것들을 .Child를 통해 접근(리스트,딕셔너리 가능)
-    private async Task LoadUserData()
+    private async Task LoadUserData(bool openPanel)
     {
         //코루틴 yield return 방식을 async/ await 비동기 방식으로 바꿈 -> DB는 이게 더 좋다고함
         Task<DataSnapshot> deckTask = deckRef.GetValueAsync(); //유저 아이디 속의 모든 정보를 가져옴
@@ -195,7 +205,10 @@ public class MakeInitPlayerDeck:MonoBehaviour
             }
             //Debug.Log("초기덱 저장완료3");
             currentPlayerDeck.Clear();
-            deckSettingPanel.SetActive(true);
+            if(openPanel)
+            {
+                deckSettingPanel.SetActive(true);
+            }
             //플레이어 덱 리스트 DB에서 가져오기
             foreach (DataSnapshot item in deckTask.Result.Children) //Child는 하나, Children은 여러개
             {
