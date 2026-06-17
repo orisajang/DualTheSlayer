@@ -3,6 +3,8 @@
 ![Card Game](https://img.shields.io/badge/CardGame-000000)
 > Slay the Spire 스타일의 덱 빌딩 카드 게임을 포톤 네트워크를 이동해 1:1 전투로 구현한 프로젝트 입니다.
 
+[프로젝트 영상 링크](https://www.youtube.com/watch?v=nbG6xvXAIWs&list=PLghZvj7DrWymGFZS1hgF3oARn77LIHMPC&index=1)
+
 프로젝트 목표 : 포톤 네트워크 및 Firebase DB를 활용하며 깊은 이해와 Slay the Spire 방식의 게임 형식을 구현
 
 프로젝트 기간: 2026.01.13 ~ 26.02.04 (23일)
